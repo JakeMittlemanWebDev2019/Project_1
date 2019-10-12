@@ -1,0 +1,9 @@
+<script>
+ window.gameName = "<%= @name %>";
+</script>
+
+<h1>Welcome to Ogetarts</h1>
+
+<div id="root">
+  React component loading...
+</div>

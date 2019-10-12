@@ -1,9 +1,13 @@
-<!-- <script>
- window.gameName = "game";
-</script> -->
+<p>Please enter a game name</p>
+<input id="gameName" type="text" rel="noreferrer">
+<button onClick={getName()}>Submit</button>
 
-<p>Hello</p>
-
-<div id="root">
-  React component loading...
-</div>
+<script>
+function getName(){
+    // attribution:
+    // https://www.w3schools.com/howto/howto_js_redirect_webpage.asp
+    var url = "localhost:4000/games/" +
+                document.getElementById("gameName").value;
+    window.location.href = url;
+}
+</script>

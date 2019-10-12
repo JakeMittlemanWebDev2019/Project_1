@@ -4,35 +4,58 @@ import _ from 'lodash';
 import '../css/app.css';
 import $ from 'jquery';
 
-export default function game_init(root) {
-  ReactDOM.render(<Ogetarts />, root);
+export default function game_init(root, channel) {
+  ReactDOM.render(<Ogetarts channel={channel}/>, root);
 }
 
 class Ogetarts extends React.Component {
   constructor(props) {
     super(props);
-    // this.channel = props.channel;
+    this.channel = props.channel;
     this.state = {
-      nums: [5],
+      skel: 5,
     };
 
-    // this.channel.join()
-    //             .receive("ok", this.onJoin.bind(this))
-    //             .receive("error", resp => {console.log(resp);});
+    this.channel.join()
+                .receive("ok", this.onJoin.bind(this))
+                .receive("error", resp => {console.log(resp);});
   }
 
-  // onJoin({game}) {
-  //   this.setState(game);
-  // }
+  onJoin({game}) {
+    this.setState(game);
+  }
+
+  onUpdate({game}) {
+    this.setState(game);
+  }
+
+  changeState() {
+    if (this.state.skel == 5) {
+      let state1 = _.assign({}, this.state, {skel: 2});
+      this.setState(state1);
+    }
+    else {
+      let state1 = _.assign({}, this.state, {skel: 5});
+      this.setState(state1);
+    };
+  }
+
   render() {
+    let val = this.state.skel
     return (
       <div>
-       <p>5</p>
+        <div>
+        {val}
+        </div>
+        <div>
+        <Change root={this}/>
+        </div>
       </div>
     );
   }
 }
 
-function GetArray() {
-  return <p>5</p>;
+function Change(props) {
+  let {root} = props;
+  return (<button onClick={() => root.changeState()}>Change</button>);
 }
