@@ -19,8 +19,6 @@ import $ from "jquery";
 // import socket from "./socket";
 import game_init from "./ogetarts";
 
-console.log("A");
-
 $(function() {
   let root = document.getElementById('root');
   if (root) {

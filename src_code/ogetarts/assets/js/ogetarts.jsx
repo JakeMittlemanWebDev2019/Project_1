@@ -5,7 +5,6 @@ import '../css/app.css';
 import $ from 'jquery';
 
 export default function game_init(root) {
-  console.log("made it here in game_init");
   ReactDOM.render(<Ogetarts />, root);
 }
 
