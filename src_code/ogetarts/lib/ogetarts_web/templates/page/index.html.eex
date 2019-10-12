@@ -1,0 +1,9 @@
+<!-- <script>
+ window.gameName = "game";
+</script> -->
+
+<p>Hello</p>
+
+<div id="root">
+  React component loading...
+</div>
