@@ -2,7 +2,7 @@ defmodule Ogetarts.Game do
 
   def new do
     %{
-      skel: 5,
+      board: [],
     }
   end
 
