@@ -56,18 +56,23 @@ function GameBoard(props) {
   let y = 100;
   let nums = _.range(0, 11);
   let grid = _.map(nums, (i) => {
+    // returning an Array
+    // [[Vertical Lines], [Horizontal Lines]]
+    // This makes the grid
+    // we'll need to not hard-code these values, but
+    // at least it works :)
     return ([<Line
             key={i}
-            points={[100 + Math.round(i*padding), 100, 100 + Math.round(i*padding), 400]}
+            points={[100 + Math.round(i*padding), 100,
+                    100 + Math.round(i*padding), 400]}
             stroke="black"
             strokeWidth={2}
           />,
-          <Line
-                  key={i+20}
-                  points={[100, 100 + Math.round(i*padding), 400, 100 + Math.round(i*padding)]}
-                  stroke="black"
-                  strokeWidth={2}
-                />]);
+          <Line key={i+20}
+                points={[100, 100 + Math.round(i*padding),
+                        400, 100 + Math.round(i*padding)]}
+                stroke="black"
+                strokeWidth={2} />]);
   });
   return grid;
 
