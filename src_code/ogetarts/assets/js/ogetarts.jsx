@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import '../css/app.css';
 import $ from 'jquery';
-import React, { Component } from 'react';
-import ReactDOM, { render } from 'react-dom';
-import { Stage, Layer, Text, Rect } from 'react-konva';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Stage, Layer, Text, Rect, Circle, Line } from 'react-konva';
 import Konva from 'konva';
 
 
@@ -41,35 +41,61 @@ class Ogetarts extends React.Component {
 
   render() {
     return (
-        <div>
-            <GameBoard />
-        </div>
-        );
-    }
+      <Stage width={1000} height={1000}>
+        <Layer>
+          <GameBoard />
+        </Layer>
+      </Stage>
+    );
+  }
 }
 
 function GameBoard(props) {
-    var stage = new Konva.Stage( {
-        container: 'container',
-        width: 1000,
-        height: 1000,
-    });
+  let padding = 30;
+  let x = 100;
+  let y = 100;
+  let nums = _.range(0, 11);
+  let grid = _.map(nums, (i) => {
+    return ([<Line
+            key={i}
+            points={[100 + Math.round(i*padding), 100, 100 + Math.round(i*padding), 400]}
+            stroke="black"
+            strokeWidth={2}
+          />,
+          <Line
+                  key={i+20}
+                  points={[100, 100 + Math.round(i*padding), 400, 100 + Math.round(i*padding)]}
+                  stroke="black"
+                  strokeWidth={2}
+                />]);
+  });
+  return grid;
 
-    var layer = new Konva.Layer();
+    // var stage = new Konva.Stage( {
+    //     container: 'root',
+    //     width: 1000,
+    //     height: 1000,
+    // });
 
-    var circle = new Konva.Circle({
-        x: stage.width() / 2,
-        y: stage.height() / 2,
-        radius: 70,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 4
-    });
+    // var layer = new Konva.Layer();
 
-    layer.add(circle);
-    stage.add(layer);
-    layer.draw();
-    stage.draw();
+    // var circle = new Konva.Circle({
+    //     x: 1000 / 2,
+    //     y: 1000 / 2,
+    //     radius: 70,
+    //     fill: 'red',
+    //     stroke: 'black',
+    //     strokeWidth: 4
+    // });
+    //
+    // return (<Circle x={500} y={500} radius={70} fill='red' stroke='black'
+    //         strokeWidth={4} />);
+
+    // layer.add(circle);
+    // stage.add(layer);
+    // layer.draw();
+    // stage.draw();
+    // return layer;
 }
 
 
