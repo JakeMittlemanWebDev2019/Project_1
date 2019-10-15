@@ -17,12 +17,8 @@ class Ogetarts extends React.Component {
 
     this.channel = props.channel;
     this.state = {
-        WIDTH: 1000,
-        HEIGHT: 1000,
-        X1: 200,
-        Y1: 200,
-        // BOARDWIDTH: 800,
-        // padding: BOARDWIDTH/10,
+        board: [[],[],[],[],[],[],[],[],[],[]]
+
     };
 
     this.channel.join()
@@ -38,12 +34,17 @@ class Ogetarts extends React.Component {
     this.setState(game);
   }
 
+  clicked(event) {
+     return null;
+  }
+
 
   render() {
     return (
       <Stage width={1000} height={1000}>
         <Layer>
-          <GameBoard />
+            <GameBoard />
+            <GamePieces root={this}/>
         </Layer>
       </Stage>
     );
@@ -75,101 +76,75 @@ function GameBoard(props) {
                 strokeWidth={2} />]);
   });
   return grid;
+}
 
-    // var stage = new Konva.Stage( {
-    //     container: 'root',
-    //     width: 1000,
-    //     height: 1000,
-    // });
+function GamePieces(props) {
+    let {root} = props;
+    let padding = 30;
+    let pieceSize = 30;
+    let nums = _.range(0,10);
+    let rows = _.range(0,4);
+    let x = 100;
+    let y = 100;
 
-    // var layer = new Konva.Layer();
 
-    // var circle = new Konva.Circle({
-    //     x: 1000 / 2,
-    //     y: 1000 / 2,
-    //     radius: 70,
-    //     fill: 'red',
-    //     stroke: 'black',
-    //     strokeWidth: 4
-    // });
-    //
-    // return (<Circle x={500} y={500} radius={70} fill='red' stroke='black'
-    //         strokeWidth={4} />);
+    let pieces = _.map(root.state.board, (row, i) => {
 
-    // layer.add(circle);
-    // stage.add(layer);
-    // layer.draw();
-    // stage.draw();
-    // return layer;
+         return _.map(row, (piece,j) => {
+            let player = piece[2];
+
+            if (player === 2) {
+                return ([<Rect
+                    key={i,j}
+                    onClick = {() => root.clicked()}
+                    width={pieceSize}
+                    height={pieceSize}
+                    stroke="black"
+                    x={x + Math.round(j*padding)}
+                    y={y + Math.round(i*padding)}
+                    fill="blue" />]);
+            }
+            else {
+                return ([<Rect
+                    key={i,j}
+                    onClick = {() => root.clicked()}
+                    width={pieceSize}
+                    height={pieceSize}
+                    stroke="black"
+                    x={x + Math.round(j*padding)}
+                    y={y + Math.round(i*padding)}
+                    fill="red" />]);
+            }
+        });
+    });
+    return pieces;
 }
 
 
 
-
-
-
-      // <Stage width={window.innerWidth} height={window.innerHeight}>
-      //   <Layer>
-      //     <Text text="Try to drag a star" />
-      //     {[...Array(10)].map((_, i) => (
-      //       <Star
-      //         key={i}
-      //         x={Math.random() * window.innerWidth}
-      //         y={Math.random() * window.innerHeight}
-      //         numPoints={5}
-      //         innerRadius={20}
-      //         outerRadius={40}
-      //         fill="#89b717"
-      //         opacity={0.8}
-      //         draggable
-      //         rotation={Math.random() * 180}
-      //         shadowColor="black"
-      //         shadowBlur={10}
-      //         shadowOpacity={0.6}
-      //         onDragStart={this.handleDragStart}
-      //         onDragEnd={this.handleDragEnd}
-      //       />
-      //     ))}
-      //   </Layer>
-      // </Stage>
-
-
-
-
-
-
-
-// function Change(props) {
-//   let {root} = props;
-//   return (<button onClick={() => root.changeState()}>Change</button>);
+// function GamePieces(props) {
+//     let {root} = props;
+//     let padding = 30;
+//     let pieceSize = 30;
+//     let nums = _.range(0,10);
+//     let rows = _.range(0,4);
+//     let x = 100;
+//     let y = 100;
+//
+//
+//     let pieces = _.map(rows, (j) => {
+//
+//          return _.map(nums, (i) => {
+//             return ([<Rect
+//                 key={i}
+//                 onClick = {() => root.clicked()}
+//                 width={pieceSize}
+//                 height={pieceSize}
+//                 stroke="black"
+//                 x={x + Math.round(i*padding)}
+//                 y={y + Math.round(j*padding)}
+//                 fill="blue" />]);
+//         });
+//     });
+//     return pieces;
 // }
-
-
-
-
-
-
-
-
-
-// let val = this.state.skel
-// return (
-//   <div>
-//     <div>
-//     {val}
-//     </div>
-//     <div>
-//     <Change root={this}/>
-//     </div>
-//   </div>
-
-  // changeState() {
-  //   if (this.state.skel == 5) {
-  //     let state1 = _.assign({}, this.state, {skel: 2});
-  //     this.setState(state1);
-  //   }
-  //   else {
-  //     let state1 = _.assign({}, this.state, {skel: 5});
-  //     this.setState(state1);
-  //   };
-  // }
