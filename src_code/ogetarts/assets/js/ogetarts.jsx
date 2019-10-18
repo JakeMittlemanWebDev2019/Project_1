@@ -19,7 +19,9 @@ class Ogetarts extends React.Component {
     this.state = {
         board: [],
         last_click: [],
-
+        p1PieceCount: 33,
+        p2PieceCount: 33,
+        flagFound: false,
     };
 
     this.channel.join()
@@ -33,12 +35,27 @@ class Ogetarts extends React.Component {
 
   onUpdate({game}) {
     this.setState(game);
+    gameOver();
   }
+
+  gameOver() {
+    if (this.state.p1PieceCount == 0) {
+        alert("Game Over! Player 2 Won!")
+    }
+    else if (this.state.p2PieceCount == 0) {
+        alert("Game Over! Player 1 Won!")
+    }
+    else if (this.state.flagFound) {
+        alert("Game Over!")
+    }
+
+  }
+
 
   clicked(key) {
-      this.channel.push("click", key)
+      this.channel.push("click", {i: key[0], j: key[1]})
+      .receive("ok", this.onUpdate.bind(this));
   }
-
 
   render() {
     return (
@@ -119,6 +136,7 @@ function GamePieces(props) {
             else {
                 return ([<Rect
                     key={i,j}
+                    onClick = {() => root.clicked([i,j])}
                     width={pieceSize}
                     height={pieceSize}
                     stroke="black"

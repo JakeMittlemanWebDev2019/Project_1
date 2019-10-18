@@ -1,36 +1,75 @@
 defmodule Ogetarts.Game do
 
+    #TODO: make functions, eliminate duplicate code
+    #TODO: validate legal moves per each rank (not for flags or bombs)
+    #TODO: attacking logic for ranked pieces
+    #TODO: highlight clicked pieces
+    #TODO: highlight available moves
+    #TODO: implementing water in middle
+
   def new do
     %{
       board: build_board(),
-      last_click: []
+      last_click: [],
+      p1_piece_count: 33,
+      p2_piece_count: 33,
+      flag_found: false,
     }
   end
 
   def client_view(game) do
     %{
         # array: [id, rank, player]
-        board: game.board
+        board: game.board,
+        last_click: game.last_click
     }
   end
 
-  def move_piece(game, key) do
-    if (game.last_click == []) do
-        row = Enum.fetch(game.board, hd key)
-        piece = Enum.fetch(row, tl key)
-        Map.put(game, :last_click, piece)
+  def move_piece(game, i, j) do
+    if (length(game.last_click) == 0) do
+        IO.puts(i)
+        IO.puts(j)
+        row = Enum.at(game.board, i)
+        piece = Enum.at(row, j)
 
+        if (length(piece) != 0) do
+            Map.put(game, :last_click, piece)
+        else
+            game
+        end
     else
         board = game.board
-        row = Enum.fetch(board, hd key)
-        new_row = List.update_at(row, tl key, fn f -> (game.last_click) end)
-        board = List.insert_at(board, hd key, new_row)
-        Map.merge(game, %{:last_click [], :board board})
+        insert_row = Enum.at(board, i)
+        delete_row = Enum.at(board, Enum.at(game.last_click, 3))
+
+        new_row = Enum.map_reduce(insert_row, 0, fn piece, index ->
+            if (index == (j)) do
+                {game.last_click, index + 1}
+            else
+                {piece, index + 1}
+            end
+        end)
+        board = List.insert_at(board, i, elem(new_row,0))
+        board = List.delete_at(board, i+1)
+
+
+        delete_row = Enum.map_reduce(delete_row, 0, fn piece, index ->
+            if (index == Enum.at(game.last_click, 4)) do
+                {[], index + 1}
+            else
+                {piece, index + 1}
+            end
+        end)
+
+        board = List.insert_at(board, Enum.at(game.last_click, 3), elem(delete_row,0))
+        board = List.delete_at(board, Enum.at(game.last_click, 3) + 1)
+
+
+        Map.merge(game, %{last_click: [], board: board})
     end
   end
 
-
-  def build_board()  do
+  def build_board() do
 
     p1 = [1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6,
             7, 7, 7, 8, 8, 9, 10, 11, 11, 11, 11, 11, 11, 12]
@@ -41,14 +80,14 @@ defmodule Ogetarts.Game do
     p1_shuffle = Enum.shuffle(p1)
     p2_shuffle = Enum.shuffle(p2)
 
-    Enum.map(1..10, fn i ->
-        Enum.map(1..10, fn j ->
+    Enum.map(0..9, fn i ->
+        Enum.map(0..9, fn j ->
             cond do
-                i <= 4 ->
-                    [(10*i)-(10-j), Enum.at(p1_shuffle, (10*i)-(10-j)-1), 1]
-                i >= 7 ->
-                    [(10*i)-(10-j), Enum.at(p2_shuffle, 100 - ((10*i)-(10-j))), 2]
-                i > 4 && i < 7 ->
+                i <= 3 ->
+                    [(10*(i+1))-(10-(j+1)), Enum.at(p1_shuffle, (10*(i+1))-(10-(j+1))-1), 1, i, j]
+                i >= 6 ->
+                    [(10*(i+1))-(10-(j+1)), Enum.at(p2_shuffle, 100 - ((10*(i+1))-(10-(j+1))+1)), 2, i, j]
+                i > 3 && i < 6 ->
                     []
             end
         end)
