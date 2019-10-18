@@ -35,7 +35,8 @@ class Ogetarts extends React.Component {
   }
 
   clicked(event) {
-     return null;
+     console.log(event.target.x);
+     console.log(event.target.y);
   }
 
 
@@ -96,7 +97,7 @@ function GamePieces(props) {
             if (player === 2) {
                 return ([<Rect
                     key={i,j}
-                    onClick = {() => root.clicked()}
+                    onClick = {(e) => root.clicked(this)}
                     width={pieceSize}
                     height={pieceSize}
                     stroke="black"
@@ -104,16 +105,26 @@ function GamePieces(props) {
                     y={y + Math.round(i*padding)}
                     fill="blue" />]);
             }
-            else {
+            else if (player === 1){
                 return ([<Rect
                     key={i,j}
-                    onClick = {() => root.clicked()}
+                    onClick = {(e) => root.clicked(this)}
                     width={pieceSize}
                     height={pieceSize}
                     stroke="black"
                     x={x + Math.round(j*padding)}
                     y={y + Math.round(i*padding)}
                     fill="red" />]);
+            }
+            else {
+                return ([<Rect
+                    key={i,j}
+                    width={pieceSize}
+                    height={pieceSize}
+                    stroke="black"
+                    x={x + Math.round(j*padding)}
+                    y={y + Math.round(i*padding)}
+                    fill="white" />]);
             }
         });
     });
