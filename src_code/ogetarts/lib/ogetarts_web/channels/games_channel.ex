@@ -18,6 +18,12 @@ defmodule OgetartsWeb.GamesChannel do
     end
   end
 
+  def handle_in("click", %{"key" => key}, socket) do
+      game = socket.assigns[:game]
+      game = Game.move_piece(game, key)
+      {:reply, {:ok, %{ "game" => game }}, socket}
+  end
+
   # Add authorization logic here as required.
   def authorized?(_payload) do
     true

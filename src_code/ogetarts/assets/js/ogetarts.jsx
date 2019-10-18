@@ -17,7 +17,8 @@ class Ogetarts extends React.Component {
 
     this.channel = props.channel;
     this.state = {
-        board: [[],[],[],[],[],[],[],[],[],[]]
+        board: [],
+        last_click: [],
 
     };
 
@@ -34,9 +35,8 @@ class Ogetarts extends React.Component {
     this.setState(game);
   }
 
-  clicked(event) {
-     console.log(event.target.x);
-     console.log(event.target.y);
+  clicked(key) {
+      this.channel.push("click", key)
   }
 
 
@@ -97,7 +97,7 @@ function GamePieces(props) {
             if (player === 2) {
                 return ([<Rect
                     key={i,j}
-                    onClick = {(e) => root.clicked(this)}
+                    onClick = {() => root.clicked([i,j])}
                     width={pieceSize}
                     height={pieceSize}
                     stroke="black"
@@ -108,7 +108,7 @@ function GamePieces(props) {
             else if (player === 1){
                 return ([<Rect
                     key={i,j}
-                    onClick = {(e) => root.clicked(this)}
+                    onClick = {() => root.clicked([i,j])}
                     width={pieceSize}
                     height={pieceSize}
                     stroke="black"

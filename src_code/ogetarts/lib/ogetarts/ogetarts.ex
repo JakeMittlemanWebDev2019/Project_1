@@ -2,7 +2,8 @@ defmodule Ogetarts.Game do
 
   def new do
     %{
-      board: build_board()
+      board: build_board(),
+      last_click: []
     }
   end
 
@@ -11,6 +12,21 @@ defmodule Ogetarts.Game do
         # array: [id, rank, player]
         board: game.board
     }
+  end
+
+  def move_piece(game, key) do
+    if (game.last_click == []) do
+        row = Enum.fetch(game.board, hd key)
+        piece = Enum.fetch(row, tl key)
+        Map.put(game, :last_click, piece)
+
+    else
+        board = game.board
+        row = Enum.fetch(board, hd key)
+        new_row = List.update_at(row, tl key, fn f -> (game.last_click) end)
+        board = List.insert_at(board, hd key, new_row)
+        Map.merge(game, %{:last_click [], :board board})
+    end
   end
 
 
