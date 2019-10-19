@@ -1,6 +1,5 @@
 defmodule Ogetarts.Game do
 
-    #TODO: make functions, eliminate duplicate code
     #TODO: validate legal moves per each rank (not for flags or bombs)
     #TODO: attacking logic for ranked pieces
     #TODO: highlight clicked pieces
@@ -25,10 +24,30 @@ defmodule Ogetarts.Game do
     }
   end
 
+  def change_board_row(game, board, row, new_data, i, j) do
+
+    new_row = Enum.map_reduce(row, 0, fn piece, index ->
+        if (index == (j)) do
+          if (length(new_data) != 0) do
+            # If we're not removing a piece
+            # we have to update its i and j
+            updated_data = List.replace_at(new_data, 3, i)
+            updated_data = List.replace_at(updated_data, 4, j)
+            {updated_data, index + 1}
+          else
+            {new_data, index + 1}
+          end
+        else
+          {piece, index + 1}
+        end
+    end)
+    # _board = List.insert_at(board, i, elem(new_row,0))
+    # List.delete_at(_board, i+1)
+    List.replace_at(board, i, elem(new_row,0))
+  end
+
   def move_piece(game, i, j) do
     if (length(game.last_click) == 0) do
-        IO.puts(i)
-        IO.puts(j)
         row = Enum.at(game.board, i)
         piece = Enum.at(row, j)
 
@@ -39,33 +58,53 @@ defmodule Ogetarts.Game do
         end
     else
         board = game.board
+        # This is the i value in last_click so we don't have to
+        # keep calling Enum.at.
+        # The (i, j) pair passed into the function is for the
+        # insert row.
+        delete_i = Enum.at(game.last_click, 3)
+        # this is the same for j
+        delete_j = Enum.at(game.last_click, 4)
+
         insert_row = Enum.at(board, i)
-        delete_row = Enum.at(board, Enum.at(game.last_click, 3))
 
-        new_row = Enum.map_reduce(insert_row, 0, fn piece, index ->
-            if (index == (j)) do
-                {game.last_click, index + 1}
-            else
-                {piece, index + 1}
-            end
-        end)
-        board = List.insert_at(board, i, elem(new_row,0))
-        board = List.delete_at(board, i+1)
+        # This is the duplicated code, just in a function now
+        # With all the params honestly not sure it's better, but
+        # code at least isn't duplicated now....
+        board = change_board_row(game, board, insert_row, game.last_click, i, j)
 
-
-        delete_row = Enum.map_reduce(delete_row, 0, fn piece, index ->
-            if (index == Enum.at(game.last_click, 4)) do
-                {[], index + 1}
-            else
-                {piece, index + 1}
-            end
-        end)
-
-        board = List.insert_at(board, Enum.at(game.last_click, 3), elem(delete_row,0))
-        board = List.delete_at(board, Enum.at(game.last_click, 3) + 1)
-
+        # very important that this is after we insert.
+        # Otherwise it's taking an old state if you're moving a piece
+        # in the same row.
+        delete_row = Enum.at(board, delete_i)
+        board = change_board_row(game, board, delete_row,
+                                [], delete_i, delete_j)
 
         Map.merge(game, %{last_click: [], board: board})
+
+        # This was moved to "change_board_row"
+
+        # new_row = Enum.map_reduce(insert_row, 0, fn piece, index ->
+        #     if (index == (j)) do
+        #         {game.last_click, index + 1}
+        #     else
+        #         {piece, index + 1}
+        #     end
+        # end)
+        # board = List.insert_at(board, i, elem(new_row,0))
+        # board = List.delete_at(board, i+1)
+        #
+        #
+        # delete_row = Enum.map_reduce(delete_row, 0, fn piece, index ->
+        #     if (index == Enum.at(game.last_click, 4)) do
+        #         {[], index + 1}
+        #     else
+        #         {piece, index + 1}
+        #     end
+        # end)
+        #
+        # board = List.insert_at(board, Enum.at(game.last_click, 3), elem(delete_row,0))
+        # board = List.delete_at(board, Enum.at(game.last_click, 3) + 1)
     end
   end
 

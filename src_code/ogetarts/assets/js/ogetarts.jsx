@@ -35,7 +35,7 @@ class Ogetarts extends React.Component {
 
   onUpdate({game}) {
     this.setState(game);
-    gameOver();
+    this.gameOver();
   }
 
   gameOver() {
@@ -63,6 +63,7 @@ class Ogetarts extends React.Component {
         <Layer>
             <GameBoard />
             <GamePieces root={this}/>
+            <Ranks root={this}/>
         </Layer>
       </Stage>
     );
@@ -147,6 +148,38 @@ function GamePieces(props) {
         });
     });
     return pieces;
+}
+
+// This puts ranks over the squares
+function Ranks(props) {
+  let {root} = props;
+  let padding = 30;
+  let pieceSize = 30;
+  let x = 100;
+  let y = 100;
+
+
+  let ranks = _.map(root.state.board, (row, i) => {
+
+       return _.map(row, (piece,j) => {
+          let rank = piece[1]
+
+          if (rank) {
+            return (
+              [<Text
+                key={i,j}
+                text={rank}
+                fill="white"
+                fontFamily="Georgia"
+                fontSize={16}
+                listening={false}
+                x={x + Math.round(j*padding) + pieceSize/4}
+                y={y + Math.round(i*padding) + pieceSize/4}
+              />]);
+          }
+      });
+  });
+  return ranks;
 }
 
 
