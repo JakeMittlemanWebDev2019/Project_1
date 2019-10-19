@@ -1,6 +1,5 @@
 defmodule Ogetarts.Game do
 
-    #TODO: validate legal moves per each rank (not for flags or bombs)
     #TODO: attacking logic for ranked pieces
     #TODO: highlight clicked pieces
     #TODO: highlight available moves
@@ -48,10 +47,52 @@ defmodule Ogetarts.Game do
     List.replace_at(board, i, elem(new_row,0))
   end
 
+
+  def is_legal_move(game, piece, i, j) do
+    last_i = Enum.at(game.last_click, 3)
+    last_j = Enum.at(game.last_click, 4)
+    board = game.board
+    # Get the player number, 1 or 2, of the last clicked piece, and next clicked piece
+    last_player_piece = Enum.at(game.last_click,2)
+    current_player_piece = Enum.at(piece,2)
+
+    cond do
+        ((last_i + 1) == i && (last_j) == j) && last_player_piece != current_player_piece ->
+            true
+        ((last_i - 1) == i && (last_j) == j) && last_player_piece != current_player_piece ->
+            true
+        ((last_j + 1) == j && (last_i) == i) && last_player_piece != current_player_piece ->
+            true
+        ((last_j - 1) == j && (last_i) == i) && last_player_piece != current_player_piece ->
+            true
+
+
+        #TODO: we need to be able to deselect a piece we previously
+        # selected and added to last_click. If we can't deselect, then we will
+        # get stuck if we click on a piece that is surrounded by it's own pieces...
+
+        # This logic isn't quite right, but it's
+        # on the right track i think? Currently it's deleting the piece, instead
+        # of just clearing out last_click
+        game.last_click == piece ->
+            Map.merge(game, %{last_click: [], board: board})
+
+
+        # Cond statements need at least one statement to be truthy. We can't
+        # Compile if every statemnt in a cond is false. This true -> false
+        # block is a default truthy statement. We now check if is_legal_move
+        # returns true in the move_piece function
+        true ->
+            false
+    end
+  end
+
+
   def move_piece(game, i, j) do
+      row = Enum.at(game.board, i)
+      piece = Enum.at(row, j)
     if (length(game.last_click) == 0) do
-        row = Enum.at(game.board, i)
-        piece = Enum.at(row, j)
+
 
         if (length(piece) != 0) do
             Map.put(game, :last_click, piece)
@@ -59,31 +100,37 @@ defmodule Ogetarts.Game do
             game
         end
     else
-        board = game.board
-        # This is the i value in last_click so we don't have to
-        # keep calling Enum.at.
-        # The (i, j) pair passed into the function is for the
-        # insert row.
-        delete_i = Enum.at(game.last_click, 3)
-        # this is the same for j
-        delete_j = Enum.at(game.last_click, 4)
+        if (is_legal_move(game, piece, i, j)) do
+            board = game.board
+            # This is the i value in last_click so we don't have to
+            # keep calling Enum.at.
+            # The (i, j) pair passed into the function is for the
+            # insert row.
+            delete_i = Enum.at(game.last_click, 3)
+            # this is the same for j
+            delete_j = Enum.at(game.last_click, 4)
 
-        insert_row = Enum.at(board, i)
+            insert_row = Enum.at(board, i)
 
-        # This is the duplicated code, just in a function now
-        # With all the params honestly not sure it's better, but
-        # code at least isn't duplicated now....
-        board = change_board_row(game, board, insert_row, game.last_click, i, j)
+            # This is the duplicated code, just in a function now
+            # With all the params honestly not sure it's better, but
+            # code at least isn't duplicated now....
+            board = change_board_row(game, board, insert_row, game.last_click, i, j)
 
-        # very important that this is after we insert.
-        # Otherwise it's taking an old state if you're moving a piece
-        # in the same row.
-        delete_row = Enum.at(board, delete_i)
+            # very important that this is after we insert.
+            # Otherwise it's taking an old state if you're moving a piece
+            # in the same row.
+            delete_row = Enum.at(board, delete_i)
 
-        board = change_board_row(game, board, delete_row,
-                                [], delete_i, delete_j)
+            board = change_board_row(game, board, delete_row,
+                                    [], delete_i, delete_j)
 
-        Map.merge(game, %{last_click: [], board: board})
+            Map.merge(game, %{last_click: [], board: board})
+        else
+            game
+        end
+    end
+end
 
         # This was moved to "change_board_row"
 
@@ -108,8 +155,7 @@ defmodule Ogetarts.Game do
         #
         # board = List.insert_at(board, Enum.at(game.last_click, 3), elem(delete_row,0))
         # board = List.delete_at(board, Enum.at(game.last_click, 3) + 1)
-    end
-  end
+
 
   def build_board() do
 
@@ -188,6 +234,7 @@ defmodule Ogetarts.Game do
     cond do
         value - 1 == 0 ->
             {key, value, Map.delete(map, key)}
+
 
         value - 1 != 0 ->
             {key, value, Map.put(map, key, value-1)}
