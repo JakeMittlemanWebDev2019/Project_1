@@ -1,43 +1,44 @@
 defmodule Ogetarts.Game do
-
+    #TODO: when moving a 2, we need to check if there are pieces in between. 2 should not be able to jump over pieces
     #TODO: attacking logic for ranked pieces
     #TODO: highlight clicked pieces
     #TODO: highlight available moves
     #TODO: implementing water in middle
+    #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
 
-  def new do
+    def new do
     %{
-      board: build_board(),
-      last_click: [],
-      p1_piece_count: 33,
-      p2_piece_count: 33,
-      flag_found: false,
+        board: build_board(),
+        last_click: [],
+        p1_piece_count: 33,
+        p2_piece_count: 33,
+        flag_found: false,
     }
-  end
+    end
 
-  def client_view(game) do
+    def client_view(game) do
     %{
         # array: [id, rank, player]
         board: game.board,
         last_click: game.last_click
     }
-  end
+    end
 
-  def change_board_row(game, board, row, new_data, i, j) do
+    def change_board_row(game, board, row, new_data, i, j) do
 
     new_row = Enum.map_reduce(row, 0, fn piece, index ->
         if (index == (j)) do
-          if (length(new_data) != 0) do
-            # If we're not removing a piece
-            # we have to update its i and j
-            updated_data = List.replace_at(new_data, 3, i)
-            updated_data = List.replace_at(updated_data, 4, j)
-            {updated_data, index + 1}
-          else
-            {new_data, index + 1}
-          end
+            if (length(new_data) != 0) do
+                # If we're not removing a piece
+                # we have to update its i and j
+                updated_data = List.replace_at(new_data, 3, i)
+                updated_data = List.replace_at(updated_data, 4, j)
+                {updated_data, index + 1}
+            else
+                {new_data, index + 1}
+            end
         else
-          {piece, index + 1}
+            {piece, index + 1}
         end
     end)
 
@@ -48,15 +49,101 @@ defmodule Ogetarts.Game do
   end
 
 
+
+    def attack(game, attacked_piece) do
+        #TODO
+        # bombs(rank 11) kill everyone except miners(rank 3)
+        # attacking flag(rank 12) should set flag_found state variable and end the game
+        # marshall(rank 10) can only be killed by spy(rank 1)
+        # Decrement p1 or p2 piece count, if necessary
+        # pieces of equal rank attacking each other both are killed
+
+        attacking_piece = game.last_click
+        attacking_piece_rank = Enum.at(attacking_piece,1)
+        attacking_piece_player = Enum.at(attacking_piece, 2)
+
+        attacked_piece_rank = Enum.at(attacked_piece, 1)
+        attacked_piece_player = Enum.at(attacked_piece, 2)
+
+        cond do
+            # flag is attacked
+            attacked_piece_rank == 12 ->
+                #TODO
+                # set flag_found, send alert, end game
+                true
+
+            # bomb is attacked by miner
+            (attacked_piece_rank == 11) && (attacking_piece_rank == 3) ->
+                #TODO
+                # remove attacked piece from the board
+                # DO NOT decrement piece counts
+                true
+
+            # bomb is attacked by non-miner
+            (attacked_piece_rank == 11) && (attacking_piece_rank != 3) ->
+                #TODO
+                # remove attacking piece from the board
+                # decrement attacking_piece_rank piece count
+                true
+
+            # marhsall attacked by spy
+            (attacked_piece_rank == 10) && (attacking_piece_rank == 1) ->
+                #TODO
+                # remove attacked_piece from the board
+                # decrement attacked_piece_rank's piece count
+                true
+
+            # pieces of equal rank kill each other
+            (attacked_piece_rank == attacking_piece_rank) ->
+                #TODO
+                # remove both pieces from the board
+                # decrement both p1 and p2 piece count
+                true
+
+            # pieces of different ranks
+            (attacked_piece_rank != attacking_piece_rank) ->
+                #TODO
+                if (attacking_piece_rank > attacked_piece_rank) do
+                    # remove attacked_piece
+                    # decrement attacked_piece_rank's piece count
+                    true
+                else
+                    # remove attacking_piece
+                    # decrement attacking_piece_rank's piece count
+                    true
+                end
+
+            # default
+            true ->
+                true
+        end
+
+
+
+
+    end
+
+
+
   def is_legal_move(game, piece, i, j) do
+    #TODO: when moving a 2, we need to check if there are pieces in between. 2 should not be able to jump over pieces
+
     last_i = Enum.at(game.last_click, 3)
     last_j = Enum.at(game.last_click, 4)
+    last_rank = Enum.at(game.last_click, 1)
     board = game.board
     # Get the player number, 1 or 2, of the last clicked piece, and next clicked piece
     last_player_piece = Enum.at(game.last_click,2)
     current_player_piece = Enum.at(piece,2)
 
     cond do
+        # scout (rank 2) movement is horizontal or vertical, unlimited spaces
+        (last_rank == 2) && ((last_i == i) || (last_j == j)) && last_player_piece != current_player_piece ->
+            true
+
+        # any piece can move horizontally or vertially once space. Bombs and flags
+        # are restricted in move_piece to prevent last_click being set if a player
+        # clicks a bomb or a flag
         ((last_i + 1) == i && (last_j) == j) && last_player_piece != current_player_piece ->
             true
         ((last_i - 1) == i && (last_j) == j) && last_player_piece != current_player_piece ->
@@ -77,7 +164,6 @@ defmodule Ogetarts.Game do
         game.last_click == piece ->
             Map.merge(game, %{last_click: [], board: board})
 
-
         # Cond statements need at least one statement to be truthy. We can't
         # Compile if every statemnt in a cond is false. This true -> false
         # block is a default truthy statement. We now check if is_legal_move
@@ -89,18 +175,25 @@ defmodule Ogetarts.Game do
 
 
   def move_piece(game, i, j) do
-      row = Enum.at(game.board, i)
-      piece = Enum.at(row, j)
+    row = Enum.at(game.board, i)
+    piece = Enum.at(row, j)
+
     if (length(game.last_click) == 0) do
-
-
-        if (length(piece) != 0) do
+        # piece cannot be empty, piece cannot be bomb or flag (rank 11 or 12)
+        if ((length(piece) != 0) && Enum.at(piece,1) <=10) do
             Map.put(game, :last_click, piece)
         else
             game
         end
+
     else
         if (is_legal_move(game, piece, i, j)) do
+
+
+            #TODO:
+            # We should probably trigger the attack logic here?
+
+
             board = game.board
             # This is the i value in last_click so we don't have to
             # keep calling Enum.at.
