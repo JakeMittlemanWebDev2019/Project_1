@@ -41,8 +41,10 @@ defmodule Ogetarts.Game do
           {piece, index + 1}
         end
     end)
-    # _board = List.insert_at(board, i, elem(new_row,0))
-    # List.delete_at(_board, i+1)
+
+    # We're dumb and didn't even look at replace_at.
+    # Now we don't have to insert/delete. We just replace.
+    # Can't believe we missed that for like 72 hours
     List.replace_at(board, i, elem(new_row,0))
   end
 
@@ -77,6 +79,7 @@ defmodule Ogetarts.Game do
         # Otherwise it's taking an old state if you're moving a piece
         # in the same row.
         delete_row = Enum.at(board, delete_i)
+
         board = change_board_row(game, board, delete_row,
                                 [], delete_i, delete_j)
 
@@ -133,6 +136,8 @@ defmodule Ogetarts.Game do
 
     end)
 
+    # Do we need this anymore?
+
     # p1_piece_map = %{"1": 1, "2": 8, "3": 5, "4": 4, "5": 4, "6": 4, "7": 3, "8": 2, "9": 1, "10": 1,"11": 6, "12": 1}
     # p2_piece_map = %{"1": 1, "2": 8, "3": 5, "4": 4, "5": 4, "6": 4, "7": 3, "8": 2, "9": 1, "10": 1,
     #     "11": 6, "12": 1
@@ -158,6 +163,7 @@ defmodule Ogetarts.Game do
 
   end
 
+  # Do we need this anymore?
   def get_random_piece(map) do
       # select a piece where the value is not 0
     # {key,value} = Enum.random(map)
