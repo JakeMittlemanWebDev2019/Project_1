@@ -1,7 +1,4 @@
 defmodule Ogetarts.Game do
-    #TODO: when moving a 2, we need to check if there are pieces in between. 2 should not be able to jump over pieces
-    #TODO: attacking logic for ranked pieces
-    #TODO: highlight clicked pieces
     #TODO: highlight available moves
     #TODO: implementing water in middle
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
