@@ -97,6 +97,17 @@ function GameBoard(props) {
   return grid;
 }
 
+// This is needed to check if two arrays
+// are equal because Javascript blows and can't do it by itself
+function checkArrays(arrayA, arrayB) {
+  for (let i = 0; i < arrayA.length; i++) {
+    if (arrayA[i] != arrayB[i]) {
+      return false
+    }
+  }
+  return true
+}
+
 function GamePieces(props) {
     let {root} = props;
     let padding = 30;
@@ -112,16 +123,31 @@ function GamePieces(props) {
          return _.map(row, (piece,j) => {
             let player = piece[2];
 
+            // piece highlight.
+            if (piece.length != 0 &&
+              checkArrays(piece, root.state.last_click)) {
+                
+              return ([<Rect
+                  key={i,j}
+                  onClick = {() => root.clicked([i,j])}
+                  width={pieceSize}
+                  height={pieceSize}
+                  stroke="black"
+                  x={x + Math.round(j*padding)}
+                  y={y + Math.round(i*padding)}
+                  fill="#E30094" />]);
+            }
+
             if (player === 2) {
-                return ([<Rect
-                    key={i,j}
-                    onClick = {() => root.clicked([i,j])}
-                    width={pieceSize}
-                    height={pieceSize}
-                    stroke="black"
-                    x={x + Math.round(j*padding)}
-                    y={y + Math.round(i*padding)}
-                    fill="blue" />]);
+              return ([<Rect
+                  key={i,j}
+                  onClick = {() => root.clicked([i,j])}
+                  width={pieceSize}
+                  height={pieceSize}
+                  stroke="black"
+                  x={x + Math.round(j*padding)}
+                  y={y + Math.round(i*padding)}
+                  fill="blue" />]);
             }
             else if (player === 1){
                 return ([<Rect

@@ -24,26 +24,46 @@ defmodule Ogetarts.Game do
     }
     end
 
+    # Changed this to not use map_reduce because we have List.replace_at()
     def change_board_row(game, board, row, new_data, i, j) do
 
-      new_row = Enum.map_reduce(row, 0, fn piece, index ->
-          if (index == (j)) do
-              if (length(new_data) != 0) do
-                  # If we're not removing a piece
-                  # we have to update its i and j
-                  updated_data = List.replace_at(new_data, 3, i)
-                  updated_data = List.replace_at(updated_data, 4, j)
-                  {updated_data, index + 1}
-              else
-                  {new_data, index + 1}
-              end
-          else
-              {piece, index + 1}
-          end
-    end)
+      if (length(new_data) != 0) do
+        # If we're not removing a piece
+        # we have to update its i and j
+        new_piece = new_data
+        |> List.replace_at(3, i)
+        |> List.replace_at(4, j)
 
-    List.replace_at(board, i, elem(new_row,0))
-  end
+        # put new piece in new row
+        new_row = List.replace_at(row, j, new_piece)
+
+        List.replace_at(board, i, new_row)
+      else
+        # put new piece in new row
+        new_row = List.replace_at(row, j, new_data)
+
+        List.replace_at(board, i, new_row)
+      end
+
+
+      # new_row = Enum.map_reduce(row, 0, fn piece, index ->
+      #     if (index == (j)) do
+      #         if (length(new_data) != 0) do
+      #             # If we're not removing a piece
+      #             # we have to update its i and j
+      #             updated_data = List.replace_at(new_data, 3, i)
+      #             updated_data = List.replace_at(updated_data, 4, j)
+      #             {updated_data, index + 1}
+      #         else
+      #             {new_data, index + 1}
+      #         end
+      #     else
+      #         {piece, index + 1}
+      #     end
+      # end)
+
+
+    end
 
   # If the Attacking Piece wins, we put attacker in attacked slot
   # and make the old attacker's slot []
@@ -131,24 +151,6 @@ defmodule Ogetarts.Game do
               #TODO
               # remove attacked piece from the board
               # DO NOT decrement piece counts
-              # a) Change Miner's i and j values
-              # old_i = Enum.at(attacking_piece, 3)
-              # old_j = Enum.at(attacking_piece, 4)
-              # new_i = Enum.at(attacked_piece, 3)
-              # new_j = Enum.at(attacked_piece, 4)
-              #
-              # board = game.board
-              # insert_row = Enum.at(board, new_i)
-              #
-              # board = change_board_row(game, board, insert_row, game.last_click, new_i, new_j)
-              #
-              # delete_row = Enum.at(board, old_i)
-              # board = change_board_row(game, board, delete_row,
-              #                         [], old_i, old_j)
-              #
-              # Map.merge(game, %{last_click: [], board: board})
-              #def resolve_attack(game, attacking_piece, attacked_piece,
-              #                  update_counts, player) do
               resolve_attacker_wins(game, attacking_piece,
                                     attacked_piece, false, 0)
 
@@ -170,9 +172,11 @@ defmodule Ogetarts.Game do
               # remove attacked_piece from the board
               # decrement attacked_piece_rank's piece count
               if (attacked_piece_player == 1) do
-                resolve_attacker_wins(game, attacking_piece, attacked_piece, true, 1)
+                resolve_attacker_wins(game, attacking_piece,
+                                      attacked_piece, true, 1)
               else
-                resolve_attacker_wins(game, attacking_piece, attacked_piece, true, 2)
+                resolve_attacker_wins(game, attacking_piece,
+                                      attacked_piece, true, 2)
               end
 
           # pieces of equal rank kill each other
@@ -180,7 +184,24 @@ defmodule Ogetarts.Game do
               #TODO
               # remove both pieces from the board
               # decrement both p1 and p2 piece count
-              true
+              attacker_i = Enum.at(attacking_piece, 3)
+              attacker_j = Enum.at(attacking_piece, 4)
+              defender_i = Enum.at(attacked_piece, 3)
+              defender_j = Enum.at(attacked_piece, 4)
+              board = game.board
+
+              new_attacker_row = Enum.at(board, attacker_i)
+              new_defender_row = Enum.at(board, defender_i)
+
+              board = change_board_row(game, board, new_attacker_row, [],
+                                attacker_i, attacker_j)
+
+              board = change_board_row(game, board, new_defender_row, [],
+                                defender_i, defender_j)
+
+              Map.merge(game, %{last_click: [], board: board,
+                                p2_piece_count: (game.p2_piece_count - 1),
+                                p1_piece_count: (game.p1_piece_count - 1)})
 
           # pieces of different ranks
           (attacked_piece_rank != attacking_piece_rank) ->
@@ -189,9 +210,11 @@ defmodule Ogetarts.Game do
                   # remove attacked_piece
                   # decrement attacked_piece_rank's piece count
                   if (attacked_piece_player == 1) do
-                    resolve_attacker_wins(game, attacking_piece, attacked_piece, true, 1)
+                    resolve_attacker_wins(game, attacking_piece,
+                                          attacked_piece, true, 1)
                   else
-                    resolve_attacker_wins(game, attacking_piece, attacked_piece, true, 2)
+                    resolve_attacker_wins(game, attacking_piece,
+                                          attacked_piece, true, 2)
                   end
               else
                   # remove attacking_piece
