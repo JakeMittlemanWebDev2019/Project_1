@@ -36,17 +36,19 @@ class Ogetarts extends React.Component {
   onUpdate({game}) {
     this.setState(game);
     this.gameOver();
+    console.log(this.state.flagFound);
   }
 
-  gameOver() {
+  gameOver(game) {
+      console.log(this.state.flagFound)
+    if (this.state.flagFound) {
+      alert("Game Over!")
+    }
     if (this.state.p1PieceCount == 0) {
         alert("Game Over! Player 2 Won!")
     }
-    else if (this.state.p2PieceCount == 0) {
+    if (this.state.p2PieceCount == 0) {
         alert("Game Over! Player 1 Won!")
-    }
-    else if (this.state.flagFound) {
-        alert("Game Over!")
     }
 
   }
@@ -126,7 +128,7 @@ function GamePieces(props) {
             // piece highlight.
             if (piece.length != 0 &&
               checkArrays(piece, root.state.last_click)) {
-                
+
               return ([<Rect
                   key={i,j}
                   onClick = {() => root.clicked([i,j])}
@@ -207,32 +209,3 @@ function Ranks(props) {
   });
   return ranks;
 }
-
-
-
-// function GamePieces(props) {
-//     let {root} = props;
-//     let padding = 30;
-//     let pieceSize = 30;
-//     let nums = _.range(0,10);
-//     let rows = _.range(0,4);
-//     let x = 100;
-//     let y = 100;
-//
-//
-//     let pieces = _.map(rows, (j) => {
-//
-//          return _.map(nums, (i) => {
-//             return ([<Rect
-//                 key={i}
-//                 onClick = {() => root.clicked()}
-//                 width={pieceSize}
-//                 height={pieceSize}
-//                 stroke="black"
-//                 x={x + Math.round(i*padding)}
-//                 y={y + Math.round(j*padding)}
-//                 fill="blue" />]);
-//         });
-//     });
-//     return pieces;
-// }

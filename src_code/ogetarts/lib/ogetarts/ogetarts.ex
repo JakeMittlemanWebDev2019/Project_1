@@ -1,4 +1,6 @@
 defmodule Ogetarts.Game do
+    #TODO: bug - double clicking a piece deletes it
+    #TODO: bug - im finding scenarios where two 3's attacking each other, and the attacking 3 doesn't get deleted
     #TODO: highlight available moves
     #TODO: implementing water in middle
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
@@ -17,7 +19,10 @@ defmodule Ogetarts.Game do
     %{
         # array: [id, rank, player]
         board: game.board,
-        last_click: game.last_click
+        last_click: game.last_click,
+        p1_piece_count: game.p1_piece_count,
+        p2_piece_count: game.p2_piece_count,
+        flag_found: game.flag_found,
     }
     end
 
@@ -141,7 +146,11 @@ defmodule Ogetarts.Game do
           attacked_piece_rank == 12 ->
               #TODO
               # set flag_found, send alert, end game
-              true
+
+             game = Map.merge(game, %{
+                                flag_found: true
+                                })
+             game
 
           # bomb is attacked by miner
           (attacked_piece_rank == 11) && (attacking_piece_rank == 3) ->
@@ -290,8 +299,6 @@ defmodule Ogetarts.Game do
     last_player_piece = Enum.at(game.last_click,2)
     current_player_piece = Enum.at(to_spot,2)
 
-    IO.puts("Here")
-
     cond do
         # scout (rank 2) movement is horizontal or vertical, unlimited spaces
         (last_rank == 2) && ((last_i == i) || (last_j == j)) && last_player_piece != current_player_piece ->
@@ -322,7 +329,7 @@ defmodule Ogetarts.Game do
         # on the right track i think? Currently it's deleting the piece, instead
         # of just clearing out last_click
         game.last_click == to_spot ->
-            Map.merge(game, %{last_click: [], board: board})
+            Map.merge(game, %{last_click: []})
 
         # Cond statements need at least one statement to be truthy. We can't
         # Compile if every statemnt in a cond is false. This true -> false
@@ -348,10 +355,6 @@ defmodule Ogetarts.Game do
 
     else
         if (is_legal_move(game, piece, i, j)) do
-
-
-            #TODO:
-            # We should probably trigger the attack logic here?
 
             if (length(piece) != 0) do
               attack(game, piece)
