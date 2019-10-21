@@ -6,7 +6,6 @@ import ReactDOM from 'react-dom';
 import { Stage, Layer, Text, Rect, Circle, Line } from 'react-konva';
 import Konva from 'konva';
 
-
 export default function game_init(root, channel) {
   ReactDOM.render(<Ogetarts channel={channel}/>, root);
 }
@@ -19,9 +18,9 @@ class Ogetarts extends React.Component {
     this.state = {
         board: [],
         last_click: [],
-        p1PieceCount: 33,
-        p2PieceCount: 33,
-        flagFound: false,
+        p1_piece_count: 33,
+        p2_piece_count: 33,
+        flag_found: false,
     };
 
     this.channel.join()
@@ -36,22 +35,18 @@ class Ogetarts extends React.Component {
   onUpdate({game}) {
     this.setState(game);
     this.gameOver();
-    console.log(this.state.flagFound);
   }
 
   gameOver(game) {
-      console.log(this.state.flagFound)
-    if (this.state.flagFound) {
+    if (this.state.flag_found || this.state.p1PieceCount == 0 || this.state.p2PieceCount == 0) {
       alert("Game Over!")
-    }
-    if (this.state.p1PieceCount == 0) {
-        alert("Game Over! Player 2 Won!")
-    }
-    if (this.state.p2PieceCount == 0) {
-        alert("Game Over! Player 1 Won!")
-    }
 
+
+          this.channel.push("reset").
+          receive("ok", this.onUpdate.bind(this));
+      ;
   }
+}
 
 
   clicked(key) {

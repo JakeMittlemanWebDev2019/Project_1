@@ -25,6 +25,12 @@ defmodule OgetartsWeb.GamesChannel do
       {:reply, {:ok, %{ "game" => Game.client_view(game)}}, socket}
   end
 
+  def handle_in("reset", _payload, socket) do
+      game = Game.reset_game()
+      socket = assign(socket, :game, game)
+      {:reply, {:ok, %{ "game" => Game.client_view(game)}}, socket}
+  end
+
   # def handle_in("whiteclick", %{"i" => i, "j" => j}, socket) do
   #     game = socket.assigns[:game]
   #     game = Game.white_click(game, i, j)
