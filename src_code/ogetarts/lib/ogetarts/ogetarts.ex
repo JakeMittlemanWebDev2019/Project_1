@@ -354,39 +354,43 @@ defmodule Ogetarts.Game do
         end
 
     else
-        if (is_legal_move(game, piece, i, j)) do
-
-            if (length(piece) != 0) do
-              attack(game, piece)
-            else
-              board = game.board
-              # This is the i value in last_click so we don't have to
-              # keep calling Enum.at.
-              # The (i, j) pair passed into the function is for the
-              # insert row.
-              delete_i = Enum.at(game.last_click, 3)
-              # this is the same for j
-              delete_j = Enum.at(game.last_click, 4)
-
-              insert_row = Enum.at(board, i)
-
-              # This is the duplicated code, just in a function now
-              # With all the params honestly not sure it's better, but
-              # code at least isn't duplicated now....
-              board = change_board_row(game, board, insert_row, game.last_click, i, j)
-
-              # very important that this is after we insert.
-              # Otherwise it's taking an old state if you're moving a piece
-              # in the same row.
-              delete_row = Enum.at(board, delete_i)
-
-              board = change_board_row(game, board, delete_row,
-                                      [], delete_i, delete_j)
-
-              Map.merge(game, %{last_click: [], board: board})
-            end
+        if (piece == game.last_click) do
+          Map.merge(game, %{last_click: []})
         else
-            game
+          if (is_legal_move(game, piece, i, j)) do
+
+              if (length(piece) != 0) do
+                attack(game, piece)
+              else
+                board = game.board
+                # This is the i value in last_click so we don't have to
+                # keep calling Enum.at.
+                # The (i, j) pair passed into the function is for the
+                # insert row.
+                delete_i = Enum.at(game.last_click, 3)
+                # this is the same for j
+                delete_j = Enum.at(game.last_click, 4)
+
+                insert_row = Enum.at(board, i)
+
+                # This is the duplicated code, just in a function now
+                # With all the params honestly not sure it's better, but
+                # code at least isn't duplicated now....
+                board = change_board_row(game, board, insert_row, game.last_click, i, j)
+
+                # very important that this is after we insert.
+                # Otherwise it's taking an old state if you're moving a piece
+                # in the same row.
+                delete_row = Enum.at(board, delete_i)
+
+                board = change_board_row(game, board, delete_row,
+                                        [], delete_i, delete_j)
+
+                Map.merge(game, %{last_click: [], board: board})
+              end
+          else
+              game
+          end
         end
     end
 end
