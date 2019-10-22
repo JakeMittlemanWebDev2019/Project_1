@@ -9,7 +9,8 @@ defmodule Ogetarts.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      OgetartsWeb.Endpoint
+      OgetartsWeb.Endpoint,
+      Ogetarts.BackupAgent,
       # Starts a worker by calling: Ogetarts.Worker.start_link(arg)
       # {Ogetarts.Worker, arg},
     ]

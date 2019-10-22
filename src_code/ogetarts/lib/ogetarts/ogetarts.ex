@@ -1,5 +1,8 @@
 defmodule Ogetarts.Game do
-    #TODO: bug - im finding scenarios where two 3's attacking each other, and the attacking 3 doesn't get deleted
+    #TODO: BackupAgent
+    #TODO: genserver
+    #TODO: nat chat (aka chat tuck)
+    #TODO: separate clients, and separate client views
     #TODO: implementing water in middle
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
 

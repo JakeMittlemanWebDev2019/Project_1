@@ -19,10 +19,19 @@ import $ from "jquery";
 import socket from "./socket";
 import game_init from "./ogetarts";
 
-$(function() {
-  let root = document.getElementById('root');
-  if (root) {
-    let channel = socket.channel("games:" + window.gameName, {})
-    game_init(root, channel);
-  }
+$(() => {
+    let root = $('#root')[0];
+    if (root) {
+        let channel = socket.channel("games:" + window.gameName, {});
+        game_init(root, channel);
+    }
 });
+
+
+// $(function() {
+//   let root = document.getElementById('root');
+//   if (root) {
+//     let channel = socket.channel("games:" + window.gameName, {})
+//     game_init(root, channel);
+//   }
+// });

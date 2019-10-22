@@ -82,13 +82,13 @@ function GameBoard(props) {
             key={i}
             points={[100 + Math.round(i*padding), 100,
                     100 + Math.round(i*padding), 400]}
-            stroke="black"
+            stroke="#2B043D"
             strokeWidth={2}
           />,
           <Line key={i+20}
                 points={[100, 100 + Math.round(i*padding),
                         400, 100 + Math.round(i*padding)]}
-                stroke="black"
+                stroke="#2B043D"
                 strokeWidth={2} />]);
   });
   return grid;
@@ -129,7 +129,7 @@ function GamePieces(props) {
                   onClick = {() => root.clicked([i,j])}
                   width={pieceSize}
                   height={pieceSize}
-                  stroke="black"
+                  stroke="#2B043D"
                   x={x + Math.round(j*padding)}
                   y={y + Math.round(i*padding)}
                   fill="#E30094" />]);
@@ -141,10 +141,10 @@ function GamePieces(props) {
                   onClick = {() => root.clicked([i,j])}
                   width={pieceSize}
                   height={pieceSize}
-                  stroke="black"
+                  stroke="#2B043D"
                   x={x + Math.round(j*padding)}
                   y={y + Math.round(i*padding)}
-                  fill="blue" />]);
+                  fill="#246B61" />]);
             }
             else if (player === 1){
                 return ([<Rect
@@ -152,10 +152,10 @@ function GamePieces(props) {
                     onClick = {() => root.clicked([i,j])}
                     width={pieceSize}
                     height={pieceSize}
-                    stroke="black"
+                    stroke="#2B043D"
                     x={x + Math.round(j*padding)}
                     y={y + Math.round(i*padding)}
-                    fill="red" />]);
+                    fill="#AA3939" />]);
             }
             else {
                 return ([<Rect
@@ -163,7 +163,7 @@ function GamePieces(props) {
                     onClick = {() => root.clicked([i,j])}
                     width={pieceSize}
                     height={pieceSize}
-                    stroke="black"
+                    stroke="#2B043D"
                     x={x + Math.round(j*padding)}
                     y={y + Math.round(i*padding)}
                     fill="white" />]);

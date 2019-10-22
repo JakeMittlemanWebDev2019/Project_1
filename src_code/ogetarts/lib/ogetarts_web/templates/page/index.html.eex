@@ -8,6 +8,7 @@ function getName(){
     // https://www.w3schools.com/howto/howto_js_redirect_webpage.asp
     var url = "localhost:4000/games/" +
                 document.getElementById("gameName").value;
-    window.location.href = url;
+    window.location.replace = url;
+
 }
 </script>
