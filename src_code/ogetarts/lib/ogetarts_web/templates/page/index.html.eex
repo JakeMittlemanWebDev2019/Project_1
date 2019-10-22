@@ -1,4 +1,11 @@
-<p>Please enter a game name</p>
+ <%= form_for @conn, "/games", fn f -> %>
+      <p>Enter game name: <%= text_input f, :name %></p>
+      <p><%= submit "Enter game" %></p>
+    <% end %>
+
+
+
+<%# <p>Please enter a game name</p>
 <input id="gameName" type="text" rel="noreferrer">
 <button onClick={getName()}>Submit</button>
 
@@ -9,6 +16,12 @@ function getName(){
     var url = "localhost:4000/games/" +
                 document.getElementById("gameName").value;
     window.location.replace = url;
+    console.log(url)
 
 }
 </script>
+
+
+- post to server, server redirect 
+- in starter code for homework 2
+-concatenate string in controller %>

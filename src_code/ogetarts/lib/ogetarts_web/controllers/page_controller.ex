@@ -5,7 +5,12 @@ defmodule OgetartsWeb.PageController do
     render(conn, "index.html")
   end
 
+  # def game(conn, %{"name" => name}) do
+  #   render(conn, "game.html", name: name)
+  # end
+
   def game(conn, %{"name" => name}) do
-    render(conn, "game.html", name: name)
+    render(conn, "game.html", name: "games/" <> name)
   end
+
 end
