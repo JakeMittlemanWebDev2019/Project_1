@@ -43,9 +43,9 @@ class Ogetarts extends React.Component {
     this.gameOver();
   }
 
-  updateChat({message}) {
-    let state1 = _.assign({}, this.state, {last_message: message})
-    this.setState(state1)
+  updateChat({game}) {
+    // let state1 = _.assign({}, this.state, {last_message: message})
+    this.setState(game)
   }
 
   gameOver(game) {
@@ -69,7 +69,7 @@ class Ogetarts extends React.Component {
   sendChatMessage(event) {
     console.log(event.key);
     if (event.key === "Enter") {
-      this.channel.push("chat", {message: event.value})
+      this.channel.push("chat", {message: event.target.value})
       .receive("ok", this.updateChat.bind(this));
     }
   }
@@ -94,10 +94,11 @@ class Ogetarts extends React.Component {
 
 function Chat(props) {
   let {root} = props;
+  console.log(root.state.last_message)
   return (
     <div>
-      <div id="chat"></div> 
-      <input id="chatInput" type="text" onKeyDown={root.sendChatMessage.bind(this)}></input>
+      <p id="chat">{root.last_message}</p> 
+      <input id="chatInput" type="text" onKeyDown={(e) => root.sendChatMessage(e)}></input>
     </div>
   )};
 
