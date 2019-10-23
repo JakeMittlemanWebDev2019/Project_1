@@ -45,6 +45,15 @@ defmodule OgetartsWeb.GamesChannel do
       {:reply, {:ok, %{ "game" => Game.client_view(game)}}, socket}
   end
 
+  def handle_in("chat", %{"message" => message}, socket) do
+    broadcast!(socket, "new message", message)
+    {:noreply, socket}
+  end
+
+  def handle_out("new message", %{"message" => message}, socket) do
+    {:reply, {:ok, %{"message" => message}}, socket}
+  end
+
   # Add authorization logic here as required.
   def authorized?(_payload) do
     true

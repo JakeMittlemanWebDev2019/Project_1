@@ -21,11 +21,17 @@ class Ogetarts extends React.Component {
         p1_piece_count: 33,
         p2_piece_count: 33,
         flag_found: false,
+        last_message: "",
     };
 
     this.channel.join()
                 .receive("ok", this.onJoin.bind(this))
                 .receive("error", resp => {console.log(resp);});
+
+    // this.channel.on("new message", message => {
+    //   let state1 = _.assign({}, this.state, {last_message: message})
+    //   this.setState(state1)
+    // })
   }
 
   onJoin({game}) {
@@ -35,6 +41,11 @@ class Ogetarts extends React.Component {
   onUpdate({game}) {
     this.setState(game);
     this.gameOver();
+  }
+
+  updateChat({message}) {
+    let state1 = _.assign({}, this.state, {last_message: message})
+    this.setState(state1)
   }
 
   gameOver(game) {
@@ -54,18 +65,42 @@ class Ogetarts extends React.Component {
       .receive("ok", this.onUpdate.bind(this));
   }
 
+  // https://www.youtube.com/watch?v=e5jlIejl9Fs
+  sendChatMessage(event) {
+    console.log(event.key);
+    if (event.key === "Enter") {
+      this.channel.push("chat", {message: event.value})
+      .receive("ok", this.updateChat.bind(this));
+    }
+  }
+
   render() {
     return (
-      <Stage width={1000} height={1000}>
-        <Layer>
-            <GameBoard />
-            <GamePieces root={this}/>
-            <Ranks root={this}/>
-        </Layer>
-      </Stage>
+      <div>
+        <Stage width={1000} height={1000}>
+          <Layer>
+              <GameBoard />
+              <GamePieces root={this}/>
+              <Ranks root={this}/>
+          </Layer>
+        </Stage>
+        <p>{this.state.last_message}</p>
+        <Chat root={this} />
+      </div>
     );
+  
   }
 }
+
+function Chat(props) {
+  let {root} = props;
+  return (
+    <div>
+      <div id="chat"></div> 
+      <input id="chatInput" type="text" onKeyDown={root.sendChatMessage.bind(this)}></input>
+    </div>
+  )};
+
 
 function GameBoard(props) {
   let padding = 30;
