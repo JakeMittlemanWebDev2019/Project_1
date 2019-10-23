@@ -17,8 +17,8 @@ defmodule OgetartsWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    # get "/games/:name", PageController, :game
-    post "/games", PageController, :game
+    get "/games/:name", PageController, :game
+    post "/games", PageController, :join
   end
 
   # Other scopes may use custom stacks.

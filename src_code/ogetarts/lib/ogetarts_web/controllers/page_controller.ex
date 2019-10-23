@@ -5,12 +5,12 @@ defmodule OgetartsWeb.PageController do
     render(conn, "index.html")
   end
 
-  # def game(conn, %{"name" => name}) do
-  #   render(conn, "game.html", name: name)
-  # end
+  def game(conn, %{"name" => name, "user" => user}) do
+    render(conn, "game.html", user: user, name: name)
+  end
 
-  def game(conn, %{"name" => name}) do
-    render(conn, "game.html", name: "games/" <> name)
+  def join(conn, %{"name" => name, "user" => user}) do
+    redirect(conn, to: Routes.page_path(conn, :game, user: user, name))
   end
 
 end

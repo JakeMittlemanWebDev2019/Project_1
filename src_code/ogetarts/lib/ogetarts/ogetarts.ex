@@ -1,10 +1,10 @@
 defmodule Ogetarts.Game do
-    #TODO: BackupAgent
     #TODO: genserver
     #TODO: nat chat (aka chat tuck)
     #TODO: separate clients, and separate client views
     #TODO: implementing water in middle
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
+    #TODO: show pieces that have been taken from the board
 
     def new do
     %{

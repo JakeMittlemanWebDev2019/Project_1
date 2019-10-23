@@ -11,6 +11,7 @@ defmodule Ogetarts.Application do
       # Start the endpoint when the application starts
       OgetartsWeb.Endpoint,
       Ogetarts.BackupAgent,
+      Ogetarts.GameSup,
       # Starts a worker by calling: Ogetarts.Worker.start_link(arg)
       # {Ogetarts.Worker, arg},
     ]
