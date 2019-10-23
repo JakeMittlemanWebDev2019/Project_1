@@ -6,11 +6,20 @@ defmodule OgetartsWeb.PageController do
   end
 
   def game(conn, %{"name" => name}) do
-    render(conn, "game.html", name: name)
+    user = get_session(conn, :user)
+    if (user) do
+      render(conn, "game.html", name: name)
+    else
+      conn
+      |> put_flash(:error, "Username cannot be blank")
+      |> redirect(to: "/")
+    end
   end
 
-  def join(conn, %{"name" => name}) do
-    redirect(conn, to: Routes.page_path(conn, :game, name))
+  def join(conn, %{"user" => user, "name" => name}) do
+    conn
+    |> put_session(:user, user)
+    |> redirect(to: Routes.page_path(conn, :game, name))
   end
 
 end
