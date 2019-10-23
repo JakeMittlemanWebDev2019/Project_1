@@ -1,0 +1,16 @@
+[Unit]
+Description=Memory Game
+
+[Service]
+Type=simple
+User=ogetarts
+Group=ogetarts
+Restart=on-failure
+Environment=MIX_ENV=prod "PORT=4793"
+Environment=LANG=en_US.UTF-8
+
+WorkingDirectory=/home/ogetarts/ogetarts
+ExecStart=bash /home/ogetarts/ogetarts/start.sh
+
+[Install]
+WantedBy=multi-user.target
