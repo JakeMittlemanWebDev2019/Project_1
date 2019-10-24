@@ -26,8 +26,6 @@ defmodule OgetartsWeb.GamesChannel do
   def handle_in("click", %{"i" => i, "j" => j}, socket) do
       name = socket.assigns[:name]
       user = socket.assigns[:user]
-      # IO.puts("printing user:")
-      # IO.puts(user)
 
       game = Ogetarts.GameServer.move_piece(name, user, i, j)
 

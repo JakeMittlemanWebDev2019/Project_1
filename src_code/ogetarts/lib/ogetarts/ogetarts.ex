@@ -1,7 +1,4 @@
 defmodule Ogetarts.Game do
-    #TODO: show piece that gets attacked
-    #TODO: implementing water in middle
-    #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
     #TODO: show pieces that have been taken from the board
 
     def new() do
@@ -31,9 +28,6 @@ defmodule Ogetarts.Game do
     end
 
     def build_skel(game, player1, player2, user) do
-      IO.puts(player1)
-      IO.puts(player2)
-      IO.puts(user)
       if (user == player1) do
         Enum.map(game.board, fn row ->
           Enum.map(row, fn piece ->

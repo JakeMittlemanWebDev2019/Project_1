@@ -69,14 +69,12 @@ class Ogetarts extends React.Component {
 
 
   clicked(key) {
-    console.log(this.state.players)
       this.channel.push("click", {i: key[0], j: key[1]})
       .receive("ok", this.onUpdate.bind(this));
   }
 
   // https://www.youtube.com/watch?v=e5jlIejl9Fs
   sendChatMessage(event) {
-    console.log(event.key);
     if (event.key === "Enter") {
       this.channel.push("chat", {message: event.target.value})
       // .receive("ok", this.updateChat.bind(this));
@@ -103,7 +101,6 @@ class Ogetarts extends React.Component {
 
 function Chat(props) {
   let {root} = props;
-  console.log(root.state.last_message)
   return (
     <div>
       <p id="chat">{root.last_message}</p> 
