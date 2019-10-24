@@ -17,25 +17,28 @@ defmodule Ogetarts.Game do
     }
     end
 
-    def join(game, user) do
-      players = game.players
-      players = players ++ [user]
-      IO.puts("in join in ogetarts.ex")
-      IO.inspect(players)
-      %{
-        board: game.board,
-        last_click: game.last_click,
-        p1_piece_count: game.p1_piece_count,
-        p2_piece_count: game.p2_piece_count,
-        flag_found: game.flag_found,
-        players: players,
-      }
-    end
+    # def join(game, user) do
+    #   # players = game.players
+    #   # players = players ++ [user]
+    #   # IO.puts("in join in ogetarts.ex")
+    #   # IO.inspect(players)
+    #   %{
+    #     board: game.board,
+    #     last_click: game.last_click,
+    #     p1_piece_count: game.p1_piece_count,
+    #     p2_piece_count: game.p2_piece_count,
+    #     flag_found: game.flag_found,
+    #     players: game.players,
+    #   }
+    # end
 
     def client_view(game, user) do
+      player1 = Enum.at(game.players,0)
+      player2 = Enum.at(game.players,1)
+
     %{
         # array: [id, rank, player]
-        board: game.board,
+        board: build_skel(game, player1, player2, user),
         last_click: game.last_click,
         p1_piece_count: game.p1_piece_count,
         p2_piece_count: game.p2_piece_count,
@@ -44,8 +47,31 @@ defmodule Ogetarts.Game do
     }
     end
 
-    def build_skel(game, user) do
-
+    def build_skel(game, player1, player2, user) do
+      IO.puts(player1)
+      IO.puts(player2)
+      IO.puts(user)
+      if (user == player1) do
+        Enum.map(game.board, fn row ->
+          Enum.map(row, fn piece ->
+              if (Enum.at(piece, 2) == 1) do
+                piece
+              else
+                List.replace_at(piece, 1, 0)
+              end
+          end)
+        end)
+      else
+        Enum.map(game.board, fn row ->
+          Enum.map(row, fn piece ->
+              if (Enum.at(piece, 2) == 2) do
+                piece
+              else
+                List.replace_at(piece, 1, 0)
+              end
+          end)
+        end)
+      end
     end
 
     def reset_game do
@@ -308,8 +334,6 @@ defmodule Ogetarts.Game do
 
 
   def move_piece(game, i, j) do
-    IO.puts("in move piece")
-    IO.inspect(game.players)
     row = Enum.at(game.board, i)
     piece = Enum.at(row, j)
 

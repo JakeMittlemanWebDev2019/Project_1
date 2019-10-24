@@ -228,11 +228,24 @@ function Ranks(props) {
        return _.map(row, (piece,j) => {
           let rank = piece[1]
 
-          if (rank) {
+          if (rank != 0) {
             return (
               [<Text
                 key={i,j}
                 text={rank}
+                fill="white"
+                fontFamily="Georgia"
+                fontSize={16}
+                listening={false}
+                x={x + Math.round(j*padding) + pieceSize/4}
+                y={y + Math.round(i*padding) + pieceSize/4}
+              />]);
+          }
+          else {
+            return (
+              [<Text
+                key={i,j}
+                text=""
                 fill="white"
                 fontFamily="Georgia"
                 fontSize={16}

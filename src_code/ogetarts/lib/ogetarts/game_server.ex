@@ -28,8 +28,8 @@ defmodule Ogetarts.GameServer do
         GenServer.call(reg(name), {:reset, name})
     end
 
-    def peek(name) do
-        GenServer.call(reg(name), {:peek, name})
+    def peek(name, user) do
+        GenServer.call(reg(name), {:peek, name, user})
     end
 
   
@@ -40,6 +40,8 @@ defmodule Ogetarts.GameServer do
     end
   
     def handle_call({:click, name, i, j}, _from, game) do
+      IO.puts("in game server:")
+      IO.inspect(game)
       game = Ogetarts.Game.move_piece(game, i, j)
       Ogetarts.BackupAgent.put(name, game)
       {:reply, game, game}
@@ -51,7 +53,13 @@ defmodule Ogetarts.GameServer do
       {:reply, game, game}
     end
 
-    def handle_call({:peek, _name}, _from, game) do
+    def handle_call({:peek, name, user}, _from, game) do
+      if (length(game.players) <= 2) do
+        game = Map.merge(game, %{players: (game.players ++ [user])})
+        Ogetarts.BackupAgent.put(name, game)
         {:reply, game, game}
+      else
+        {:reply, game, game}
+      end
     end
   end
