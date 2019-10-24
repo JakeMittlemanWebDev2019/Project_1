@@ -6,17 +6,33 @@ defmodule Ogetarts.Game do
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
     #TODO: show pieces that have been taken from the board
 
-    def new do
+    def new() do
     %{
         board: build_board(),
         last_click: [],
         p1_piece_count: 33,
         p2_piece_count: 33,
         flag_found: false,
+        players: [],
     }
     end
 
-    def client_view(game) do
+    def join(game, user) do
+      players = game.players
+      players = players ++ [user]
+      IO.puts("in join in ogetarts.ex")
+      IO.inspect(players)
+      %{
+        board: game.board,
+        last_click: game.last_click,
+        p1_piece_count: game.p1_piece_count,
+        p2_piece_count: game.p2_piece_count,
+        flag_found: game.flag_found,
+        players: players,
+      }
+    end
+
+    def client_view(game, user) do
     %{
         # array: [id, rank, player]
         board: game.board,
@@ -24,7 +40,12 @@ defmodule Ogetarts.Game do
         p1_piece_count: game.p1_piece_count,
         p2_piece_count: game.p2_piece_count,
         flag_found: game.flag_found,
+        players: game.players,
     }
+    end
+
+    def build_skel(game, user) do
+
     end
 
     def reset_game do
@@ -287,6 +308,8 @@ defmodule Ogetarts.Game do
 
 
   def move_piece(game, i, j) do
+    IO.puts("in move piece")
+    IO.inspect(game.players)
     row = Enum.at(game.board, i)
     piece = Enum.at(row, j)
 

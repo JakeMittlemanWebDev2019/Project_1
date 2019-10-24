@@ -8,9 +8,10 @@ defmodule OgetartsWeb.GamesChannel do
 
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
-
       Ogetarts.GameServer.start(name)
       game = Ogetarts.GameServer.peek(name)
+
+      IO.inspect(game.last_click)
 
       # game = BackupAgent.get(name) || Game.new()
 
@@ -18,7 +19,7 @@ defmodule OgetartsWeb.GamesChannel do
       |> assign(:game, game)
       |> assign(:name, name)
       BackupAgent.put(name, game)
-      {:ok, %{"join" => name, "game" => Game.client_view(game)}, socket}
+      {:ok, %{"join" => name, "game" => Game.join(game, socket.assigns[:user])}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
@@ -26,7 +27,9 @@ defmodule OgetartsWeb.GamesChannel do
 
   def handle_in("click", %{"i" => i, "j" => j}, socket) do
       name = socket.assigns[:name]
-      # game = socket.assigns[:game]
+      user = socket.assigns[:user]
+      # IO.puts("printing user:")
+      # IO.puts(user)
 
       game = Ogetarts.GameServer.move_piece(name, i, j)
 
@@ -34,7 +37,7 @@ defmodule OgetartsWeb.GamesChannel do
 
       socket = assign(socket, :game, game)
       BackupAgent.put(name, game)
-      {:reply, {:ok, %{ "game" => Game.client_view(game)}}, socket}
+      {:reply, {:ok, %{ "game" => Game.client_view(game, user)}}, socket}
   end
 
   def handle_in("reset", _payload, socket) do

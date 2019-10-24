@@ -7,8 +7,9 @@ defmodule OgetartsWeb.PageController do
 
   def game(conn, %{"name" => name}) do
     user = get_session(conn, :user)
+    IO.puts(user)
     if (user) do
-      render(conn, "game.html", name: name)
+      render(conn, "game.html", name: name, user: user)
     else
       conn
       |> put_flash(:error, "Username cannot be blank")

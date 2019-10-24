@@ -22,6 +22,7 @@ class Ogetarts extends React.Component {
         p2_piece_count: 33,
         flag_found: false,
         last_message: "",
+        players: [],
     };
 
     this.channel.join()
@@ -64,6 +65,7 @@ class Ogetarts extends React.Component {
 
 
   clicked(key) {
+    console.log(this.state.players)
       this.channel.push("click", {i: key[0], j: key[1]})
       .receive("ok", this.onUpdate.bind(this));
   }

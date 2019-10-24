@@ -10,6 +10,9 @@ we changed Routes.static_path to static_url
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Ogetarts</title>
     <link rel="stylesheet" href="<%= Routes.static_url(@conn, "/css/app.css") %>"/>
+    <script>
+     window.userToken = "<%= @user_token %>";
+    </script>
   </head>
   <body>
     <main role="main" class="container">
