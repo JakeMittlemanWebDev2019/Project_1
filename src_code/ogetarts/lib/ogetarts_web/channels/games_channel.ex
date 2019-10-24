@@ -4,7 +4,7 @@ defmodule OgetartsWeb.GamesChannel do
   alias Ogetarts.Game
   alias Ogetarts.BackupAgent
 
-  # intercept ["new message"]
+  intercept ["update"]
 
   def join("games:" <> name, payload, socket) do
     if authorized?(payload) do
@@ -29,12 +29,13 @@ defmodule OgetartsWeb.GamesChannel do
       # IO.puts("printing user:")
       # IO.puts(user)
 
-      game = Ogetarts.GameServer.move_piece(name, i, j)
+      game = Ogetarts.GameServer.move_piece(name, user, i, j)
 
       # game = Game.move_piece(game, i, j)
 
       socket = assign(socket, :game, game)
       BackupAgent.put(name, game)
+      broadcast!(socket, "update", %{game: game})
       {:reply, {:ok, %{ "game" => Game.client_view(game, user)}}, socket}
   end
 
@@ -54,15 +55,10 @@ defmodule OgetartsWeb.GamesChannel do
     {:noreply, socket}
   end
 
-  # def handle_out("new message", payload, socket) do
-  #   name = socket.assigns[:name]
-  #   game = Ogetarts.GameServer.peek(name)
-  #   {payload} = message
-  #   chatMessage = payload.message
-  #   game = Map.merge(game, %{last_message: payload.message})
-  #   IO.puts(message.message)
-  #   {:noreply, socket}
-  # end
+  def handle_out("update", payload, socket) do
+    push(socket, "update", %{ "game" => Game.client_view(payload.game, socket.assigns[:user]) })
+    {:noreply, socket}
+  end
 
   # Add authorization logic here as required.
   def authorized?(_payload) do

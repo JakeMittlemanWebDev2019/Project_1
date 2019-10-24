@@ -1,7 +1,5 @@
 defmodule Ogetarts.Game do
-    #TODO: genserver
-    #TODO: nat chat (aka chat tuck)
-    #TODO: separate clients, and separate client views
+    #TODO: show piece that gets attacked
     #TODO: implementing water in middle
     #TODO: there are a few "draw" scenarios, but they aren't technically in the game rules
     #TODO: show pieces that have been taken from the board
@@ -16,21 +14,6 @@ defmodule Ogetarts.Game do
         players: [],
     }
     end
-
-    # def join(game, user) do
-    #   # players = game.players
-    #   # players = players ++ [user]
-    #   # IO.puts("in join in ogetarts.ex")
-    #   # IO.inspect(players)
-    #   %{
-    #     board: game.board,
-    #     last_click: game.last_click,
-    #     p1_piece_count: game.p1_piece_count,
-    #     p2_piece_count: game.p2_piece_count,
-    #     flag_found: game.flag_found,
-    #     players: game.players,
-    #   }
-    # end
 
     def client_view(game, user) do
       player1 = Enum.at(game.players,0)
@@ -57,7 +40,12 @@ defmodule Ogetarts.Game do
               if (Enum.at(piece, 2) == 1) do
                 piece
               else
-                List.replace_at(piece, 1, 0)
+                if (Enum.at(piece, 5)) do
+                  piece
+                else
+                  # set rank to 0
+                  List.replace_at(piece, 1, 0)
+                end
               end
           end)
         end)
@@ -67,7 +55,12 @@ defmodule Ogetarts.Game do
               if (Enum.at(piece, 2) == 2) do
                 piece
               else
-                List.replace_at(piece, 1, 0)
+                if (Enum.at(piece, 5)) do
+                  piece
+                else
+                  # set rank to 0
+                  List.replace_at(piece, 1, 0)
+                end
               end
           end)
         end)
@@ -116,8 +109,14 @@ defmodule Ogetarts.Game do
     board = game.board
     insert_row = Enum.at(board, new_i)
 
+    piece = game.last_click
+    piece = List.replace_at(piece, 5, true)
+
+    # board = change_board_row(game, board, insert_row,
+    #                         game.last_click, new_i, new_j)
+
     board = change_board_row(game, board, insert_row,
-                            game.last_click, new_i, new_j)
+                             piece, new_i, new_j)
 
     delete_row = Enum.at(board, old_i)
     board = change_board_row(game, board, delete_row,
@@ -138,12 +137,18 @@ defmodule Ogetarts.Game do
 
   # If the defending piece wins, we remove the attacker form the board
   # since flags and bombs can't attack we always decrement piece count
-  def resolve_attacked_wins(game, attacking_piece, player) do
+  def resolve_attacked_wins(game, attacking_piece, attacked_piece, player) do
 
     i = Enum.at(attacking_piece, 3)
     j = Enum.at(attacking_piece, 4)
 
-    board = change_board_row(game, game.board, Enum.at(game.board, i), [], i, j)
+    new_piece = List.replace_at(attacked_piece, 5, true)
+
+    board = change_board_row(game, game.board, Enum.at(game.board, Enum.at(new_piece, 3)),
+                            new_piece, Enum.at(new_piece,3), Enum.at(new_piece,4))
+
+
+    board = change_board_row(game, board, Enum.at(board, i), [], i, j)
 
     if (player == 1) do
       Map.merge(game, %{last_click: [], board: board,
@@ -185,9 +190,9 @@ defmodule Ogetarts.Game do
           # bomb is attacked by non-miner
           (attacked_piece_rank == 11) && (attacking_piece_rank != 3) ->
               if (attacking_piece_player == 1) do
-                resolve_attacked_wins(game, attacking_piece, 1)
+                resolve_attacked_wins(game, attacking_piece, attacked_piece, 1)
               else
-                resolve_attacked_wins(game, attacking_piece, 2)
+                resolve_attacked_wins(game, attacking_piece, attacked_piece, 2)
               end
 
           # marhsall attacked by spy
@@ -237,9 +242,9 @@ defmodule Ogetarts.Game do
                   # remove attacking_piece
                   # decrement attacking_piece_rank's piece count
                   if (attacking_piece_player == 1) do
-                    resolve_attacked_wins(game, attacking_piece, 1)
+                    resolve_attacked_wins(game, attacking_piece, attacked_piece, 1)
                   else
-                    resolve_attacked_wins(game, attacking_piece, 2)
+                    resolve_attacked_wins(game, attacking_piece, attacked_piece, 2)
                   end
               end
 
@@ -333,57 +338,67 @@ defmodule Ogetarts.Game do
   end
 
 
-  def move_piece(game, i, j) do
+  def move_piece(game, user, i, j) do
     row = Enum.at(game.board, i)
     piece = Enum.at(row, j)
+    pieces_player = Enum.at(piece, 2)
 
-    if (length(game.last_click) == 0) do
-        # piece cannot be empty, piece cannot be bomb or flag (rank 11 or 12)
-        if ((length(piece) != 0) && Enum.at(piece,1) <=10) do
-            Map.put(game, :last_click, piece)
-        else
-            game
-        end
+    player1 = Enum.at(game.players,0)
+    player2 = Enum.at(game.players,1)
 
-    else
-        if (piece == game.last_click) do
-          Map.merge(game, %{last_click: []})
-        else
-          if (is_legal_move(game, piece, i, j)) do
+    if ((user == player1 && (pieces_player == 1 || piece == [] || length(game.last_click) != 0)) ||
+        (user == player2 && (pieces_player == 2 || piece == [] || length(game.last_click) != 0))) do
 
-              if (length(piece) != 0) do
-                attack(game, piece)
-              else
-                board = game.board
-                # This is the i value in last_click so we don't have to
-                # keep calling Enum.at.
-                # The (i, j) pair passed into the function is for the
-                # insert row.
-                delete_i = Enum.at(game.last_click, 3)
-                # this is the same for j
-                delete_j = Enum.at(game.last_click, 4)
-
-                insert_row = Enum.at(board, i)
-
-                # This is the duplicated code, just in a function now
-                # With all the params honestly not sure it's better, but
-                # code at least isn't duplicated now....
-                board = change_board_row(game, board, insert_row, game.last_click, i, j)
-
-                # very important that this is after we insert.
-                # Otherwise it's taking an old state if you're moving a piece
-                # in the same row.
-                delete_row = Enum.at(board, delete_i)
-
-                board = change_board_row(game, board, delete_row,
-                                        [], delete_i, delete_j)
-
-                Map.merge(game, %{last_click: [], board: board})
-              end
+      if (length(game.last_click) == 0) do
+          # piece cannot be empty, piece cannot be bomb or flag (rank 11 or 12)
+          if ((length(piece) != 0) && Enum.at(piece,1) <=10) do
+              Map.put(game, :last_click, piece)
           else
               game
           end
-        end
+
+      else
+          if (piece == game.last_click) do
+            Map.merge(game, %{last_click: []})
+          else
+            if (is_legal_move(game, piece, i, j)) do
+
+                if (length(piece) != 0) do
+                  attack(game, piece)
+                else
+                  board = game.board
+                  # This is the i value in last_click so we don't have to
+                  # keep calling Enum.at.
+                  # The (i, j) pair passed into the function is for the
+                  # insert row.
+                  delete_i = Enum.at(game.last_click, 3)
+                  # this is the same for j
+                  delete_j = Enum.at(game.last_click, 4)
+
+                  insert_row = Enum.at(board, i)
+
+                  # This is the duplicated code, just in a function now
+                  # With all the params honestly not sure it's better, but
+                  # code at least isn't duplicated now....
+                  board = change_board_row(game, board, insert_row, game.last_click, i, j)
+
+                  # very important that this is after we insert.
+                  # Otherwise it's taking an old state if you're moving a piece
+                  # in the same row.
+                  delete_row = Enum.at(board, delete_i)
+
+                  board = change_board_row(game, board, delete_row,
+                                          [], delete_i, delete_j)
+
+                  Map.merge(game, %{last_click: [], board: board})
+                end
+            else
+                game
+            end
+          end
+      end
+    else
+      game
     end
 end
 
@@ -402,9 +417,11 @@ end
         Enum.map(0..9, fn j ->
             cond do
                 i <= 3 ->
-                    [(10*(i+1))-(10-(j+1)), Enum.at(p1_shuffle, (10*(i+1))-(10-(j+1))-1), 1, i, j]
+                    [(10*(i+1))-(10-(j+1)), Enum.at(p1_shuffle, (10*(i+1))-(10-(j+1))-1), 1, i, j,
+                    false]
                 i >= 6 ->
-                    [(10*(i+1))-(10-(j+1)), Enum.at(p2_shuffle, 100 - ((10*(i+1))-(10-(j+1))+1)), 2, i, j]
+                    [(10*(i+1))-(10-(j+1)), Enum.at(p2_shuffle, 100 - ((10*(i+1))-(10-(j+1))+1)), 2, i, j,
+                    false]
                 i > 3 && i < 6 ->
                     []
             end

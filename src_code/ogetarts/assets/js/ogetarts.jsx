@@ -30,11 +30,15 @@ class Ogetarts extends React.Component {
                 .receive("error", resp => {console.log(resp);});
 
     this.channel.on("new message", payload => {
-      console.log("made it here")
       let state1 = _.assign({}, this.state, {last_message: payload.message})
-      console.log(state1)
-      console.log(payload.message)
       this.setState(state1)
+    })
+
+    this.channel.on("update", payload => {
+      if (payload.result) {
+        alert(payload.result)
+      }
+      this.setState(payload.game)
     })
   }
 

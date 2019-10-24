@@ -20,8 +20,8 @@ defmodule Ogetarts.GameServer do
       GenServer.start_link(__MODULE__, game, name: reg(name))
     end
   
-    def move_piece(name, i, j) do
-        GenServer.call(reg(name), {:click, name, i, j})
+    def move_piece(name, user, i, j) do
+        GenServer.call(reg(name), {:click, name, user, i, j})
     end
 
     def reset_game(name) do
@@ -39,10 +39,8 @@ defmodule Ogetarts.GameServer do
       {:ok, game}
     end
   
-    def handle_call({:click, name, i, j}, _from, game) do
-      IO.puts("in game server:")
-      IO.inspect(game)
-      game = Ogetarts.Game.move_piece(game, i, j)
+    def handle_call({:click, name, user, i, j}, _from, game) do
+      game = Ogetarts.Game.move_piece(game, user, i, j)
       Ogetarts.BackupAgent.put(name, game)
       {:reply, game, game}
     end
