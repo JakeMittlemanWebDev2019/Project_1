@@ -49,7 +49,8 @@ defmodule OgetartsWeb.GamesChannel do
 
   def handle_in("chat", %{"message" => message}, socket) do
     name = socket.assigns[:name]
-    broadcast!(socket, "new message", %{message: message})
+    user = socket.assigns[:user]
+    broadcast!(socket, "new message", %{message: message, user: user})
     {:noreply, socket}
   end
 

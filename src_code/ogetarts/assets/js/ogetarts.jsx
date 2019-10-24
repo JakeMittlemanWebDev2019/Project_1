@@ -20,8 +20,10 @@ class Ogetarts extends React.Component {
         last_click: [],
         p1_piece_count: 33,
         p2_piece_count: 33,
+        p1_captured: [],
+        p2_captured: [],
         flag_found: false,
-        last_message: "",
+        last_message: [],
         players: [],
     };
 
@@ -30,7 +32,9 @@ class Ogetarts extends React.Component {
                 .receive("error", resp => {console.log(resp);});
 
     this.channel.on("new message", payload => {
-      let state1 = _.assign({}, this.state, {last_message: payload.message})
+      let message = payload.user + ": " + payload.message;
+      let new_array = this.addMessage(message);
+      let state1 = _.assign({}, this.state, {last_message: new_array})
       this.setState(state1)
     })
 
@@ -67,6 +71,22 @@ class Ogetarts extends React.Component {
   }
 }
 
+addMessage(message) {
+  var new_array = this.state.last_message;
+  if (new_array.length < 5) {
+    new_array.push(message);
+  } 
+  else {
+    console.log("here");
+
+    for (let i = 0; i < new_array.length - 1; i++) {
+      new_array[i] = new_array[i+1];
+    }
+    new_array[new_array.length-1] = message
+  }
+  return new_array
+}
+
 
   clicked(key) {
       this.channel.push("click", {i: key[0], j: key[1]})
@@ -84,14 +104,35 @@ class Ogetarts extends React.Component {
   render() {
     return (
       <div>
-        <Stage width={1000} height={1000}>
+        <Stage width={1000} height={500}>
           <Layer>
               <GameBoard />
               <GamePieces root={this}/>
               <Ranks root={this}/>
+              <Text
+                text="Player 2's Captured Pieces"
+                fill="#2B043D"
+                fontFamily="Helvetica"
+                fontSize={20}
+                listening={false}
+                x={450-20}
+                y={110 + 170}
+              />
+              <Text
+              text="Player 1's Captured Pieces"
+              fill="#2B043D"
+              fontFamily="Helvetica"
+              fontSize={20}
+              listening={false}
+              x={450-20}
+              y={110 - 30}
+               />
+              <CapturedPieces root={this}/>
           </Layer>
         </Stage>
-        <p>{this.state.last_message}</p>
+        <div>
+          <Messages root={this}/>
+        </div>
         <Chat root={this} />
       </div>
     );
@@ -99,11 +140,78 @@ class Ogetarts extends React.Component {
   }
 }
 
+function CapturedPieces(props) {
+  let {root} = props;
+  let padding = 30;
+  let pieceSize = 30;
+  let nums = _.range(0,10);
+  let rows = _.range(0,4);
+  let x = 450;
+  let y = 110;
+
+
+    let pieces = _.map(root.state.p1_captured, (piece,j) => {
+      let rank = piece[1];
+      return([       
+        [<Rect
+        key={j}
+        width={pieceSize}
+        height={pieceSize}
+        stroke="#2B043D"
+        x={x + Math.round(j*padding)}
+        y={y}
+        fill="#AA3939" />],
+        <Text
+          key={j*10}
+          text={rank}
+          fill="white"
+          fontFamily="Georgia"
+          fontSize={16}
+          listening={false}
+          x={x + Math.round(j*padding) + pieceSize/4}
+          y={y + pieceSize/4}
+        />])
+    });
+
+    let pieces2 = _.map(root.state.p2_captured, (piece,j) => {
+      let rank = piece[1];
+      return([
+        [],
+        [<Rect
+        key={j}
+        width={pieceSize}
+        height={pieceSize}
+        stroke="#2B043D"
+        x={x + Math.round(j*padding)}
+        y={y + 200}
+        fill="#246B61" />],
+        <Text
+          key={j*10}
+          text={rank}
+          fill="white"
+          fontFamily="Georgia"
+          fontSize={16}
+          listening={false}
+          x={x + Math.round(j*padding) + pieceSize/4}
+          y={y + 200 + pieceSize/4}
+        />])
+    });
+    return [pieces,pieces2];
+}
+
+function Messages(props) {
+  let {root} = props;
+  return (
+    _.map(root.state.last_message, (message, i) => {
+      return (<div key={i}>{message}</div>);
+    })
+  );
+}
+
 function Chat(props) {
   let {root} = props;
   return (
     <div>
-      <p id="chat">{root.last_message}</p> 
       <input id="chatInput" type="text" onKeyDown={(e) => root.sendChatMessage(e)}></input>
     </div>
   )};

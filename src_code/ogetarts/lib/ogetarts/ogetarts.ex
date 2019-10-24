@@ -7,6 +7,8 @@ defmodule Ogetarts.Game do
         last_click: [],
         p1_piece_count: 33,
         p2_piece_count: 33,
+        p1_captured: [],
+        p2_captured: [],
         flag_found: false,
         players: [],
     }
@@ -22,6 +24,8 @@ defmodule Ogetarts.Game do
         last_click: game.last_click,
         p1_piece_count: game.p1_piece_count,
         p2_piece_count: game.p2_piece_count,
+        p1_captured: game.p1_captured,
+        p2_captured: game.p2_captured,
         flag_found: game.flag_found,
         players: game.players,
     }
@@ -119,10 +123,12 @@ defmodule Ogetarts.Game do
     if (update_counts) do
       if (player == 1) do
         Map.merge(game, %{last_click: [], board: board,
-                          p1_piece_count: (game.p1_piece_count - 1)})
+                          p1_piece_count: (game.p1_piece_count - 1),
+                          p1_captured: game.p1_captured ++ [attacked_piece]})
       else
         Map.merge(game, %{last_click: [], board: board,
-                          p2_piece_count: (game.p2_piece_count - 1)})
+                          p2_piece_count: (game.p2_piece_count - 1),
+                          p2_captured: game.p2_captured ++ [attacked_piece]})
       end
     else
       Map.merge(game, %{last_click: [], board: board})
@@ -146,10 +152,12 @@ defmodule Ogetarts.Game do
 
     if (player == 1) do
       Map.merge(game, %{last_click: [], board: board,
-                        p1_piece_count: (game.p1_piece_count - 1)})
+                        p1_piece_count: (game.p1_piece_count - 1),
+                        p1_captured: game.p1_captured ++ [attacking_piece]})
     else
       Map.merge(game, %{last_click: [], board: board,
-                        p2_piece_count: (game.p2_piece_count - 1)})
+                        p2_piece_count: (game.p2_piece_count - 1),
+                        p2_captured: game.p2_captured ++ [attacking_piece]})
     end
 
   end
@@ -216,9 +224,19 @@ defmodule Ogetarts.Game do
               board = change_board_row(game, board, new_defender_row, [],
                                 defender_i, defender_j)
 
-              Map.merge(game, %{last_click: [], board: board,
-                                p2_piece_count: (game.p2_piece_count - 1),
-                                p1_piece_count: (game.p1_piece_count - 1)})
+              if (attacking_piece_player == 1) do
+                Map.merge(game, %{last_click: [], board: board,
+                                  p2_piece_count: (game.p2_piece_count - 1),
+                                  p1_piece_count: (game.p1_piece_count - 1),
+                                  p1_captured: game.p1_captured ++ [attacked_piece],
+                                  p2_captured: game.p2_captured ++ [attacking_piece]})
+              else
+                Map.merge(game, %{last_click: [], board: board,
+                                  p2_piece_count: (game.p2_piece_count - 1),
+                                  p1_piece_count: (game.p1_piece_count - 1),
+                                  p1_captured: game.p1_captured ++ [attacking_piece],
+                                  p2_captured: game.p2_captured ++ [attacked_piece]})
+              end
 
           # pieces of different ranks
           (attacked_piece_rank != attacking_piece_rank) ->

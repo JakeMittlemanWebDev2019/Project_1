@@ -1,9 +1,9 @@
- <%= form_for @conn, "/games", fn f -> %>
-      <p>Enter user name: <%= text_input f, :user %></p>
-      <p>Enter game name: <%= text_input f, :name %></p>
+<%= form_for @conn, "/games", fn f -> %>
+    <p>Enter user name: <%= text_input f, :user %></p>
+    <p>Enter game name: <%= text_input f, :name %></p>
 
-      <p><%= submit "Enter game" %></p>
-    <% end %>
+    <p><%= submit "Enter game" %></p>
+<% end %>
 
 
 
