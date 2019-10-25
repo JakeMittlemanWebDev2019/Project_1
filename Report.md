@@ -5,38 +5,51 @@
 The game that we decided to create is Ogetarts. Ogetarts is a
 very close interpretation of the game Stratego, and we were able to implement
 almost all of the original game's functionality in the time allotted.
+
 Initially, the user is brought to the index page. Here, the user is prompted
 to enter a user name, and a game name. Upon entering a user name and game name,
-the user is brought to an existing game if the game exists, or a new game is
-started if the game name does not exist. When a second player joins the
+the user is brought to an existing game if the game exists, or a new game if
+the game name does not exist. When a second player joins the
 existing game, the two players can begin playing the game. If more than
 two players join the game, for example a third and fourth player, those
-extra players are allowed to view the game, chat with all players in the
-channel, and have all changes broadcasted to their socket. However,
-these extra players are not allowed to interact with the game in any way,
-they cannot influence the game state.
+extra players are allowed to join the game.
+Any extra players are allowed to view the game as it is being played, since all
+changes are broadcasted to all participants in the game channel.
+Extra players are also allowed to view and participate in chat.
+However, these extra players are not allowed to interact with the game in
+any way, since the rules of Ogetarts dictate that a maximum of 2 players can
+play.
 
 The game is played on a 10 by 10 board. Each player has 40 total pieces,
 and the pieces are distributed as such: 1 flag (rank 12), 6 bombs (rank 11),
 1 Marshall (rank 10), 1 General (rank 9), 2 Colonel (rank 8),
 3 Major (rank 7), 4 Captain (rank 6), 4 Lieutenant (rank 5), 4 Sergeant
 (rank 4), 5 Miner (rank 3), 8 Scout (rank 2), 1 spy (rank 1). Certain
-pieces have special abilities. The flag cannot be moved once placed, and if
+pieces also have special abilities. The flag cannot be moved once placed, and if
 a flag is captured by the enemy team, this ends the game. Bombs cannot be
-moved, and if a bomb is attacked by any rank other than a miner (rank 3),
-the attacking piece is killed. The scout can move any number of spaces
+moved once placed, and if a bomb is attacked by any rank other than a miner
+(rank 3), the attacking piece is killed. The scout can move any number of spaces
 horizontally or vertically, as space allows (you cannot jump over pieces).
-The spy, if it attacks a Marshall, can defeat a Marshall.
+The spy is the only piece that can defeat a Marshall, other than another
+Marshall, however the spy is required to be the attacker. The spy will be
+killed if it is attacked by the Marshall. The rules of Ogetarts dictate that
+players are only allowed to see their own pieces, or opponent pieces that have
+been revealed throughout the course of the game. Initially, all the opponent's
+pieces are displayed as blank, but piece ranks are announced during attack
+scenarios. If an opponent piece remains after an attack scenario, their piece
+rank remains revealed.  
 
 There are a few more necessary pieces of information in order to begin
 playing the game. There are two game ending scenarios: either a player's flag is
-successfully attacked by the enemy team, or one player has all of their
+successfully captured by the enemy team, or one player has all of their
 piece's captured. Legal moves are defined as such: any piece, with the
 exception of bombs and flags, can be selected and moved horizontally or
 vertically one space, except for a scout, which can move any number of spaces.
-A piece cannot move or attack vertically. A player cannot move onto their own
-piece, a player cannot jump over pieces, and if a player moves onto another
-player's piece, an attack scenario is initiated. An attack scenario will
+If a player unintentionally selects a piece, that piece can be
+deselected by clicking on it again. A piece cannot move or attack diagonally.
+A player cannot move onto a piece that belongs to them, a player cannot jump
+over pieces, and if a player moves onto a piece that belongs to another player,
+an attack scenario is initiated. An attack scenario will
 progress based on the conditions placed on how pieces of different ranks
 interact (briefly described previously, and I will go into more detail on
 this in a later paragraph).
@@ -44,11 +57,14 @@ this in a later paragraph).
 There is a text box at the bottom of the screen, below the board.
 When entering text, and selecting the "enter" key, the message is posted
 above the text box, and is broadcasted to every user in the game channel.
-Any reasonable number of players can join the game channel and chat, and will
-receive all broadcasts and updates, however any players beyond the first two
-are not allowed to play the game. To the right of the board, we have two
-areas which display all of the captured pieces belonging to each player. When
-a player's piece is captured, we add it to the area on the side of the board.
+We also implemented a chat history, up to the last 5 messages, so that
+some chat context is presented to all participants, while not taking up
+too much screen real estate. Any reasonable number of players can join the
+game channel and chat, and will receive all broadcasts and updates, however
+any players beyond the first two are not allowed to play the game. To the
+right of the board, we have two areas which display all of the captured pieces
+belonging to each player. When a player's piece is captured, it is removed,
+and added to the area on the side of the board.
 
 We used mainly react and Konva to render the UI. In our render method we
 created a stage with a single layer. In that layer it calls functions that
@@ -93,12 +109,12 @@ of players. The board is an array of 10 nested array, one for each row, and in
 each row array there are 10 piece arrays, one for each piece in the row. A
 piece is represented by an array of 6 elements: id, rank, player number,
 i, j, and revealed. In order to properly interpret moving and attacking logic,
-when a piece is selected, we add it to the last_click. We maintain a counter
+when a piece is selected, we set it to be the last_click. We maintain a counter
 to track the remaining moveable pieces each player has in order to implement
 game over logic when a player is out of moves. We also maintain lists for
 each player to track their captured pieces, and display them on the side of
 the board. We use a boolean flag found that is initialized to false, and is
-set to true if a player's flag is attacked. Finally, we maintain a list of
+set to true if a player's flag is captured. Finally, we maintain a list of
 active players, which is initialized to empty, and as users join the game,
 they are added to the players list. Only the first two players are added to
 the list, as they are the only ones allowed to play the game.  
@@ -107,7 +123,7 @@ All of the game rules are implemented on the server. The most crucial
 game logic is moving pieces. In our move_piece function, we first prevent a
 user from being able to select an opponent's piece. If we check there is no
 last_click and there is no previously selected piece, a player's piece can be
-selected, and a valid square can be subsequently selected. A legal move is
+selected, and a legal square can be subsequently selected. A legal move is
 reasoned as such in our is_legal_move logic: you cannot move onto your own
 pieces, movement must be horizontal or vertical, and you can only move one
 square at a time. We also must call separate logic for a scout, in the
@@ -147,4 +163,6 @@ cannot see the rank of those pieces.
 
 Another challenge we faced was updating the board. Due to assigned
 variables being immutable in elixir, we struggled at first to correctly update
-the board when moving a piece or attacking another piece.   
+the board when moving a piece or attacking another piece. After doing research,
+we managed to solve this problem by creating a new board row, with the updates
+applied, and then replacing the old board row with the new board row.  
