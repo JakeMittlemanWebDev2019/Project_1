@@ -388,10 +388,6 @@ defmodule Ogetarts.Game do
                   delete_j = Enum.at(game.last_click, 4)
 
                   insert_row = Enum.at(board, i)
-
-                  # This is the duplicated code, just in a function now
-                  # With all the params honestly not sure it's better, but
-                  # code at least isn't duplicated now....
                   board = change_board_row(game, board, insert_row, game.last_click, i, j)
 
                   # very important that this is after we insert.
