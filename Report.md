@@ -2,7 +2,7 @@
 ## Jake Mittleman & Jon Anton
 ## 10/24/19
 
-    The game that we decided to create is Ogetarts. Ogetarts is a
+The game that we decided to create is Ogetarts. Ogetarts is a
 very close interpretation of the game Stratego, and we were able to implement
 almost all of the original game's functionality in the time allotted.
 Initially, the user is brought to the index page. Here, the user is prompted
@@ -16,7 +16,7 @@ channel, and have all changes broadcasted to their socket. However,
 these extra players are not allowed to interact with the game in any way,
 they cannot influence the game state.
 
-    The game is played on a 10 by 10 board. Each player has 40 total pieces,
+The game is played on a 10 by 10 board. Each player has 40 total pieces,
 and the pieces are distributed as such: 1 flag (rank 12), 6 bombs (rank 11),
 1 Marshall (rank 10), 1 General (rank 9), 2 Colonel (rank 8),
 3 Major (rank 7), 4 Captain (rank 6), 4 Lieutenant (rank 5), 4 Sergeant
@@ -28,7 +28,7 @@ the attacking piece is killed. The scout can move any number of spaces
 horizontally or vertically, as space allows (you cannot jump over pieces).
 The spy, if it attacks a Marshall, can defeat a Marshall.
 
-    There are a few more necessary pieces of information in order to begin
+There are a few more necessary pieces of information in order to begin
 playing the game. There are two game ending scenarios: either a player's flag is
 successfully attacked by the enemy team, or one player has all of their
 piece's captured. Legal moves are defined as such: any piece, with the
@@ -41,7 +41,7 @@ progress based on the conditions placed on how pieces of different ranks
 interact (briefly described previously, and I will go into more detail on
 this in a later paragraph).
 
-    There is a text box at the bottom of the screen, below the board.
+There is a text box at the bottom of the screen, below the board.
 When entering text, and selecting the "enter" key, the message is posted
 above the text box, and is broadcasted to every user in the game channel.
 Any reasonable number of players can join the game channel and chat, and will
@@ -50,7 +50,7 @@ are not allowed to play the game. To the right of the board, we have two
 areas which display all of the captured pieces belonging to each player. When
 a player's piece is captured, we add it to the area on the side of the board.
 
-    We used mainly react and Konva to render the UI. In our render method we
+We used mainly react and Konva to render the UI. In our render method we
 created a stage with a single layer. In that layer it calls functions that
 create the grid first, then each square in the grid. To place the pieces,
 Javascript iterates over the given board state and based on information stored
@@ -67,7 +67,7 @@ The actions taken by the player send click information to the server and when
 the state is set, the UI gets re-rendered to display information changes like
  pieces being moved or captured/killed.
 
-	To send information from the UI to the server, we use a Phoenix Channel
+To send information from the UI to the server, we use a Phoenix Channel
 to handle push messages from the UI which calls server functions and replies
 with information back to the state. If we need to push state changes to every
 player in the game, we broadcast to each user. For messages we create a
@@ -85,7 +85,7 @@ new user will not be included in the players list. Also, we restrict the number
 of "players" to 2 players (so the third player in and any subsequent
 player won't be able to make board moves, but can still chat.)
 
-    We maintain a number of data structures on the server in order to play
+We maintain a number of data structures on the server in order to play
 the game. The state contains: a board array, a last click, player 1's
 remaining piece count, player 2's remaining piece count, player 1's captured
 pieces, player 2's captured pieces, a flag found boolean, and an array
@@ -103,7 +103,7 @@ active players, which is initialized to empty, and as users join the game,
 they are added to the players list. Only the first two players are added to
 the list, as they are the only ones allowed to play the game.  
 
-    All of the game rules are implemented on the server. The most crucial
+All of the game rules are implemented on the server. The most crucial
 game logic is moving pieces. In our move_piece function, we first prevent a
 user from being able to select an opponent's piece. If we check there is no
 last_click and there is no previously selected piece, a player's piece can be
@@ -114,7 +114,7 @@ square at a time. We also must call separate logic for a scout, in the
 checkScoutLegaLMove function, as the scout is the only piece that can move
 more than one square at a time.
 
-    If we are moving the piece to a blank spot, we only need to delete the
+If we are moving the piece to a blank spot, we only need to delete the
 piece from the row we are moving from, and add the piece to the row we are
 moving to. If the spot we are moving to contains an opponent piece, we
 need to run our attack logic. There are several scenarios, based on the
@@ -131,7 +131,7 @@ removed from the board. If an end game scenario is encountered, we alert the
 users that a player has won the game, and we call a reset_game function
 to begin a new game.
 
-    We faced a number of challenges throughout the design and engineering
+We faced a number of challenges throughout the design and engineering
 of this game. Since the game of Ogetarts dictates that each player can only
 see their own pieces, or opponent's pieces previously revealed via attacking,
 we needed to send separate game states to each player. We solved this
@@ -145,6 +145,6 @@ but with the rank set to "0" instead of the actual rank. Then, in the
 javascript, we can render pieces with rank 0 as a blank Rect, so that the user
 cannot see the rank of those pieces.   
 
-    Another challenge we faced was updating the board. Due to assigned
+Another challenge we faced was updating the board. Due to assigned
 variables being immutable in elixir, we struggled at first to correctly update
 the board when moving a piece or attacking another piece.   
